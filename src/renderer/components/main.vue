@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import CustomAudio from '@/renderer/classes/custom-audio.js'
 export default {
   name: 'main',
   data() {
@@ -10,15 +11,9 @@ export default {
   },
   methods: {},
   async mounted() {
-    // const file = await this.$readFile(localFilePath)
-    // const buffer = file.buffer
-    // const audioCtx = new AudioContext()
-    // audioCtx.decodeAudioData(buffer, (ab) => {
-    //   const source = audioCtx.createBufferSource()
-    //   source.buffer = ab
-    //   source.connect(audioCtx.destination)
-    //   source.start(0)
-    // })
+    // const audio = new CustomAudio()
+    // await audio.init(filePath)
+    // audio.source.start(0)
   },
 }
 </script>

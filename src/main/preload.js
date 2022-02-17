@@ -28,9 +28,9 @@ const listenIpc = async (listenerName, eventName, handler) => {
   await sendIpc('main', 'listen', listenerName, eventName)
 }
 
-const readFile = async (fileName, encoding) =>
+const readFile = async (filePath, encoding) =>
   new Promise((resolve) =>
-    fs.readFile(fileName, encoding, (err, data) => {
+    fs.readFile(filePath, encoding, (err, data) => {
       if (err) {
         reject(err)
       } else {
@@ -38,9 +38,13 @@ const readFile = async (fileName, encoding) =>
       }
     })
   )
+const getAudio = async (filePath) => {
+  const file = await readFile(filePath)
+  return file
+}
 
 contextBridge.exposeInMainWorld('requires', {
   listenIpc,
   sendIpc,
-  readFile,
+  getAudio,
 })
