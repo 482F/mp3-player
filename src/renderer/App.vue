@@ -18,10 +18,8 @@
 <script>
 import Titlebar from './components/titlebar.vue'
 import Main from './components/main.vue'
-import Sub from './components/sub.vue'
 const components = {
   Main,
-  Sub,
 }
 
 export default {
@@ -30,8 +28,8 @@ export default {
     Titlebar,
   },
   data: () => ({
-    titleLeft: 'lefttttttttt',
-    titleRight: 'rightttttttt',
+    titleLeft: 'mp3-player',
+    titleRight: '',
   }),
   computed: {
     components() {

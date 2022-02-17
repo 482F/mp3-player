@@ -1,8 +1,9 @@
-const { sendIpc, listenIpc } = window.requires
+const { sendIpc, listenIpc, readFile } = window.requires
 
 export default {
   install(app) {
     app.config.globalProperties.$sendIpc = sendIpc
     app.config.globalProperties.$listenIpc = listenIpc
+    app.config.globalProperties.$readFile = readFile
   },
 }
