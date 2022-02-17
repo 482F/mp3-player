@@ -1,9 +1,9 @@
-const { getAudio } = window.requires
+const { readFile } = window.requires
 
 export default class CustomAudio {
   constructor() {}
   async init(path) {
-    this.file = await getAudio(path)
+    this.file = await readFile(path)
     const buffer = this.file.buffer
     const audioCtx = new AudioContext()
     const audioBuffer = await new Promise((resolve) =>

@@ -38,13 +38,20 @@ const readFile = async (filePath, encoding) =>
       }
     })
   )
-const getAudio = async (filePath) => {
-  const file = await readFile(filePath)
-  return file
-}
+
+const writeFile = async (filePath, data, options) =>
+  new Promise((resolve) =>
+    fs.writeFile(filePath, data, options, (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
+    })
+  )
 
 contextBridge.exposeInMainWorld('requires', {
   listenIpc,
   sendIpc,
-  getAudio,
+  readFile,
 })
