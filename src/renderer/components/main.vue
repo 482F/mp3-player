@@ -9,11 +9,21 @@ export default {
   data() {
     return {}
   },
-  methods: {},
   async mounted() {
+    await this.initInfo()
     // const audio = new CustomAudio()
     // await audio.init(filePath)
     // audio.source.start(0)
+  },
+  methods: {
+    async initInfo() {
+      const [lastDir] = (await this.$sendIpc(
+        'main',
+        'getStore',
+        'lastDir'
+      )) ?? ['']
+      const info = await this.$getInfo(lastDir)
+    },
   },
 }
 </script>
