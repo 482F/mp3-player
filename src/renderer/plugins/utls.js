@@ -5,5 +5,6 @@ export default {
     for (const [name, func] of Object.entries(requires)) {
       app.config.globalProperties['$' + name] = func
     }
+    app.config.globalProperties.$console = console
   },
 }
