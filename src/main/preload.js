@@ -31,7 +31,7 @@ const listenIpc = async (listenerName, eventName, handler) => {
 }
 
 const readFile = async (filePath, encoding) =>
-  new Promise((resolve) =>
+  new Promise((resolve, reject) =>
     fs.readFile(filePath, encoding, (err, data) => {
       if (err) {
         reject(err)
@@ -42,7 +42,7 @@ const readFile = async (filePath, encoding) =>
   )
 
 const writeFile = async (filePath, data, options) =>
-  new Promise((resolve) =>
+  new Promise((resolve, reject) =>
     fs.writeFile(filePath, data, options, (err, data) => {
       if (err) {
         reject(err)
