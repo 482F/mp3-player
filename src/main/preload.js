@@ -87,23 +87,20 @@ const stat = (path) =>
     })
   )
 
-const storeAllFiles = async (files, targetDirPath, filterExts = null) => {
+const getAllFilePaths = async (targetDirPath, filterExts = null) => {
   const children = await readdir(targetDirPath)
+  const paths = []
   for (const child of children) {
     const absPath = path.join(targetDirPath, child)
     if (await stat(absPath).then((stats) => stats.isDirectory())) {
-      await storeAllFiles(files, absPath, filterExts)
+      paths.push(...(await getAllFilePaths(absPath, filterExts)))
     } else {
       if (!filterExts || filterExts.includes(child.match(/\.([^.]+)$/)[1])) {
-        files[absPath] ??= {}
+        paths.push(absPath)
       }
     }
   }
-}
-
-const updateInfo = async (info, targetDirPath) => {
-  info.files ??= {}
-  await storeAllFiles(info.files, targetDirPath, ['mp3'])
+  return paths
 }
 
 const getInfo = async (targetDirPath) => {
@@ -113,8 +110,6 @@ const getInfo = async (targetDirPath) => {
     writeFile(infoPath, '{}')
   }
   const info = JSON5.parse(await readFile(infoPath))
-  await updateInfo(info, targetDirPath)
-  await writeFile(infoPath, JSON.stringify(info, null, '  '))
   return info
 }
 
