@@ -52,19 +52,6 @@ const writeFile = async (filePath, data, options) =>
     })
   )
 
-const findInfoFilePath = (targetDirPath) => {
-  const infoPath = path.join(targetDirPath, 'info.json5')
-  if (fs.existsSync(infoPath)) {
-    return infoPath
-  }
-  const nextTargetDirPath = path.dirname(targetDirPath)
-  if (nextTargetDirPath === targetDirPath) {
-    return null
-  } else {
-    findInfoFilePath(nextTargetDirPath)
-  }
-}
-
 const readdir = (path) =>
   new Promise((resolve, reject) =>
     fs.readdir(path, (err, files) => {
@@ -87,35 +74,61 @@ const stat = (path) =>
     })
   )
 
-const getAllFilePaths = async (targetDirPath, filterExts = null) => {
-  const children = await readdir(targetDirPath)
+/*
+全部のファイルを読む必要は無い
+- でも D&D されたディレクトリ以下のファイルは全部読めるようにしておくべき
+D&D なりコマンドラインなりで渡されたファイルをアクティブなプレイリストに追加する
+info.json5 で保持するのはプレイリストと追加された曲のメタデータ (評価、歌詞、etc...)
+info.json5 に紐づけてプログラムが起動するようにしたいので info.mp5 とかにする？
+*/
+
+const getAllPaths = async (targetPaths, filterExts = null) => {
   const paths = []
-  for (const child of children) {
-    const absPath = path.join(targetDirPath, child)
-    if (await stat(absPath).then((stats) => stats.isDirectory())) {
-      paths.push(...(await getAllFilePaths(absPath, filterExts)))
-    } else {
-      if (!filterExts || filterExts.includes(child.match(/\.([^.]+)$/)[1])) {
-        paths.push(absPath)
+  for (const targetPath of targetPaths) {
+    if (await stat(targetPath).then((stats) => stats.isDirectory())) {
+      const children = await readdir(targetPath)
+      for (const child of children) {
+        const absPath = path.join(targetPath, child)
+        if (await stat(absPath).then((stats) => stats.isDirectory())) {
+          paths.push(...(await getAllPaths(absPath, filterExts)))
+        } else {
+          if (
+            !filterExts ||
+            filterExts.includes(child.match(/\.([^.]+)$/)[1])
+          ) {
+            paths.push(absPath)
+          }
+        }
       }
+    } else {
+      paths.push(targetPath)
     }
   }
   return paths
 }
 
-const getInfo = async (targetDirPath) => {
-  let infoPath = findInfoFilePath(targetDirPath)
-  if (!infoPath) {
-    infoPath = path.join(targetDirPath, 'info.json5')
-    writeFile(infoPath, '{}')
-  }
-  const info = JSON5.parse(await readFile(infoPath))
-  return info
+const infoFunctions = {
+  async export(info, infoKeys) {
+    const json = JSON.strinfigy(
+      infoKeys
+        .map((key) => ({ [key]: info[key] }))
+        .reduce((all, part) => (all = { ...all, ...part }))
+    )
+    await writeFile(json, info.infoPath)
+  },
 }
 
-contextBridge.exposeInMainWorld('requires', {
-  listenIpc,
-  sendIpc,
-  readFile,
-  getInfo,
-})
+const passObject = {
+  requires: {
+    listenIpc,
+    sendIpc,
+    readFile,
+    getAllPaths,
+  },
+  infoFunctions,
+  JSON5,
+}
+
+Object.entries(passObject).forEach(([apiKey, api]) =>
+  contextBridge.exposeInMainWorld(apiKey, api)
+)
