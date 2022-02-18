@@ -4,6 +4,7 @@
       class="music-list"
       :musics="musics"
       @insert-musics="insertMusics"
+      @open="open"
     />
   </div>
 </template>
@@ -26,9 +27,6 @@ export default {
   },
   async mounted() {
     await this.initInfo()
-    // const audio = new CustomAudio()
-    // await audio.init(filePath)
-    // audio.source.start(0)
   },
   methods: {
     async initInfo() {
@@ -47,6 +45,11 @@ export default {
         ))
       )
       this.info.export()
+    },
+    async open(music) {
+      const audio = new CustomAudio()
+      await audio.init(music.path)
+      audio.source.start(0)
     },
   },
 }
