@@ -24,8 +24,8 @@
             type="text"
             :value="list.name"
             @input="(e) => (list.name = e.target.value)"
-            @blur="endRename"
-            @keypress.enter="endRename"
+            @blur="endRename(list)"
+            @keypress.enter="endRename(list)"
           />
         </span>
         <span v-show="!list.renaming">{{ list.name }}</span>
@@ -81,8 +81,8 @@ export default {
       await this.$nextTick()
       this.$refs.renamer[index].focus()
     },
-    endRename() {
-      this.list.renaming = false
+    endRename(list) {
+      list.renaming = false
       this.$emit('export')
     },
   },
