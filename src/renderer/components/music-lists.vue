@@ -7,7 +7,7 @@
       <v-btn
         flat
         ref="list"
-        :color="currentListIndex === i ? '#ddd' : 'white'"
+        :color="currentListIndex === i ? '#C7B897' : '#eee'"
         :rounded="0"
         v-for="(list, i) of lists"
         :key="i"
