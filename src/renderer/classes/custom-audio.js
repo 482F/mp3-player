@@ -3,13 +3,13 @@ const path = window.path
 
 export default class CustomAudio {
   constructor() {}
-  static async construct(filePath) {
+  static async construct(filePath, gain) {
     const audio = new CustomAudio()
-    await audio.init(filePath)
+    await audio.init(filePath, gain)
     console.log({ audio })
     return audio
   }
-  async init(filePath) {
+  async init(filePath, gain = 1) {
     this.name = path.basename(filePath).replace(/\.[^.]+/, '')
     this.file = await readFile(filePath)
     const buffer = this.file.buffer
@@ -18,6 +18,7 @@ export default class CustomAudio {
       this._audioCtx.decodeAudioData(buffer, resolve)
     )
     this._createSource()
+    this.gain = gain
   }
   _createSource() {
     this._source = this._audioCtx.createBufferSource()
@@ -51,10 +52,10 @@ export default class CustomAudio {
   }
 
   get gain() {
-    return this._gainNode.value
+    return this._gainNode.gain.value
   }
   set gain(value) {
-    this._gainNode.value = value
+    this._gainNode.gain.value = value
   }
 
   get currentTime() {

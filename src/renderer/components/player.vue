@@ -16,7 +16,13 @@
       </div>
       <div class="between">
         <div class="left">
-          <input class="volume-slider" type="range" :max="100" :value="0" />
+          <input
+            class="volume-slider"
+            type="range"
+            :max="500"
+            :value="volume * 100"
+            @input="(e) => $emit('update:volume', e.target.valueAsNumber / 100)"
+          />
         </div>
         <div class="right">
           <v-icon>mdi-sync</v-icon>
@@ -44,6 +50,10 @@ export default {
     music: {
       type: CustomAudio,
       default: null,
+    },
+    volume: {
+      type: Number,
+      default: 1,
     },
   },
   mounted() {},
