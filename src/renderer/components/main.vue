@@ -87,10 +87,13 @@ export default {
       this.current.music.gain = this.volume = volume
     },
     async open(music, list, index) {
+      if (this.current.music) {
+        this.current.music.stop()
+        this.current.list.musics[this.current.index].isPlaying = false
+      }
       this.current.list = list
       this.current.index = index
       list.musics[index].isPlaying = true
-      this.current.music?.stop?.()
       this.current.music = await CustomAudio.construct(music.path, this.volume)
       this.current.music.start()
       this.current.music.onended = () => this.onended()
