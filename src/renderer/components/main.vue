@@ -1,9 +1,14 @@
 <template>
   <div class="f-main">
-    <player :music="currentMusic" :volume="volume" @update:volume="updateVolume" />
-    <music-list
-      class="music-list"
-      :musics="musics"
+    <player
+      :music="current.music"
+      :volume="volume"
+      @update:volume="updateVolume"
+    />
+    <music-lists
+      class="music-lists"
+      :lists="info.lists"
+      @update:lists="updateLists"
       @insert-musics="insertMusics"
       @open="open"
     />
@@ -13,21 +18,21 @@
 <script>
 import CustomAudio from '@/renderer/classes/custom-audio.js'
 import Info from '@/renderer/classes/info.js'
-import MusicList from './music-list.vue'
+import MusicLists from './music-lists.vue'
 import Player from './player.vue'
 
 export default {
   name: 'main',
   components: {
-    MusicList,
+    MusicLists,
     Player,
   },
   data() {
     return {
-      musics: [],
       info: {},
       currentMusic: null,
       volume: 1,
+      current: {},
     }
   },
   async mounted() {
@@ -38,34 +43,39 @@ export default {
       this.info = new Info()
       this.info.import('E:\\info.mp5')
     },
-    async insertMusics(e) {
-      const droppedFiles = [...e.dataTransfer.files] ?? []
+    async insertMusics(targetList, droppedFiles) {
+      console.log({ targetList, droppedFiles })
       const allPaths = await this.$getAllPaths(
         droppedFiles.map((file) => file.path),
         ['mp3']
       )
-      this.musics.push(
+      targetList.musics.push(
         ...(await Promise.all(
           allPaths.map((path) => this.info.getMusicInfo(path))
         ))
       )
       this.info.export()
     },
-    updateVolume(volume) {
-      this.currentMusic.gain = this.volume = volume
+    updateLists(lists) {
+      this.info.lists = lists
+      this.info.export()
     },
-    async open(music, index) {
-      this.currentIndex = index
-      this.currentMusic?.stop?.()
-      this.currentMusic = await CustomAudio.construct(music.path, this.volume)
-      this.currentMusic.start()
-      this.currentMusic.onended = () => this.onended()
+    updateVolume(volume) {
+      this.current.music.gain = this.volume = volume
+    },
+    async open(music, list, index) {
+      this.current.list = list
+      this.current.index = index
+      this.current.music?.stop?.()
+      this.current.music = await CustomAudio.construct(music.path, this.volume)
+      this.current.music.start()
+      this.current.music.onended = () => this.onended()
     },
     async onended() {
-      this.currentIndex++
       await this.open(
-        this.musics[this.currentIndex % this.musics.length],
-        this.currentIndex
+        this.current.list.musics[this.current.index % this.current.list.musics.length],
+        this.current.list,
+        this.current.index + 1
       )
     },
   },
@@ -79,7 +89,7 @@ export default {
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  .music-list {
+  .music-lists {
     flex-grow: 1;
     height: 100%;
     width: 100%;
