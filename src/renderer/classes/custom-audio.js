@@ -1,27 +1,74 @@
 const { readFile } = window.requires
+const path = window.path
 
 export default class CustomAudio {
   constructor() {}
-  static async construct(path) {
+  static async construct(filePath) {
     const audio = new CustomAudio()
-    await audio.init(path)
+    await audio.init(filePath)
+    console.log({ audio })
     return audio
   }
-  async init(path) {
-    this.file = await readFile(path)
+  async init(filePath) {
+    this.name = path.basename(filePath).replace(/\.[^.]+/, '')
+    this.file = await readFile(filePath)
     const buffer = this.file.buffer
-    const audioCtx = new AudioContext()
-    const audioBuffer = await new Promise((resolve) =>
-      audioCtx.decodeAudioData(buffer, resolve)
+    this._audioCtx = new AudioContext()
+    this._audioBuffer = await new Promise((resolve) =>
+      this._audioCtx.decodeAudioData(buffer, resolve)
     )
-    this.source = audioCtx.createBufferSource()
-    this.source.buffer = audioBuffer
-    this.source.connect(audioCtx.destination)
+    this._createSource()
   }
-  start() {
-    this.source.start()
+  _createSource() {
+    this._source = this._audioCtx.createBufferSource()
+    this._source.buffer = this._audioBuffer
+    this._gainNode = this._audioCtx.createGain()
+    this._source.connect(this._gainNode)
+    this._gainNode.connect(this._audioCtx.destination)
+  }
+  _interval() {
+    this._currentTime = new Date().getTime() - this._startTime
+    if (this.length <= this.currentTime) {
+      this.stop()
+      this.onended()
+    }
+  }
+  start(offset) {
+    this._startTime =
+      new Date().getTime() - (offset ?? this._currentTime ?? 0) * 1000
+    this._intervalId = setInterval(() => this._interval(), 100)
+    this._source.start(0, offset)
+    this.isPlaying = true
   }
   stop() {
-    this.source.stop()
+    if (this.isPlaying) {
+      clearInterval(this._intervalId)
+      this._intervalId = null
+      this._source.stop()
+      this._createSource()
+      this.isPlaying = false
+    }
+  }
+
+  get gain() {
+    return this._gainNode.value
+  }
+  set gain(value) {
+    this._gainNode.value = value
+  }
+
+  get currentTime() {
+    return Math.floor(this._currentTime / 100) / 10
+  }
+  set currentTime(value) {
+    this._currentTime = value * 1000
+    if (this.isPlaying) {
+      this.stop()
+      this.start(value)
+    }
+  }
+
+  get length() {
+    return Math.ceil(this._audioBuffer.duration)
   }
 }

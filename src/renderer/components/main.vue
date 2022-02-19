@@ -1,5 +1,6 @@
 <template>
   <div class="f-main">
+    <player :music="currentMusic" />
     <music-list
       class="music-list"
       :musics="musics"
@@ -13,11 +14,13 @@
 import CustomAudio from '@/renderer/classes/custom-audio.js'
 import Info from '@/renderer/classes/info.js'
 import MusicList from './music-list.vue'
+import Player from './player.vue'
 
 export default {
   name: 'main',
   components: {
     MusicList,
+    Player,
   },
   data() {
     return {
@@ -47,10 +50,19 @@ export default {
       )
       this.info.export()
     },
-    async open(music) {
+    async open(music, index) {
+      this.currentIndex = index
       this.currentMusic?.stop?.()
       this.currentMusic = await CustomAudio.construct(music.path)
       this.currentMusic.start()
+      this.currentMusic.onended = () => this.onended()
+    },
+    async onended() {
+      this.currentIndex++
+      await this.open(
+        this.musics[this.currentIndex % this.musics.length],
+        this.currentIndex
+      )
     },
   },
 }

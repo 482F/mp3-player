@@ -8,7 +8,7 @@
       <div
         v-for="(music, i) of musics"
         :key="i"
-        @dblclick="$emit('open', music)"
+        @dblclick="$emit('open', music, i)"
       >
         <v-list-item>{{ music.name }}</v-list-item>
       </div>
