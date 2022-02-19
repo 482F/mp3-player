@@ -59,7 +59,7 @@ export default class CustomAudio {
   }
 
   get currentTime() {
-    return Math.floor(this._currentTime / 100) / 10
+    return Math.floor((this._currentTime ?? 0) / 100) / 10
   }
   set currentTime(value) {
     this._currentTime = value * 1000
