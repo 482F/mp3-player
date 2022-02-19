@@ -60,11 +60,13 @@ html {
           display: flex;
           flex-direction: column;
           .electron-content {
+            min-height: 0px;
             border-style: none solid solid;
             border-color: lightgray;
             border-width: 1px;
             flex-grow: 1;
-            overflow: auto;
+          }
+          * {
             &::-webkit-scrollbar-track {
               background-color: #eee;
             }
