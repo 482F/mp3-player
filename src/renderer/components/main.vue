@@ -62,6 +62,7 @@ export default {
       this.current.index = this.$refs.musicLists.currentList.musics.findIndex(
         (music) => music.isPlaying
       )
+      this.info.export()
     },
     async initInfo() {
       this.info = new Info()

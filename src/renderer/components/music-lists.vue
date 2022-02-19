@@ -10,6 +10,12 @@
         :key="i"
         @mousedown="currentListIndex = i"
         @dblclick="renameList(list, i)"
+        @click.middle="
+          () => {
+            lists.splice(i, 1)
+            $emit('export')
+          }
+        "
       >
         <span v-show="list.renaming">
           <input
@@ -18,12 +24,8 @@
             type="text"
             :value="list.name"
             @input="(e) => (list.name = e.target.value)"
-            @blur="
-              () => {
-                list.renaming = false
-                $emit('export')
-              }
-            "
+            @blur="endRename"
+            @keypress.enter="endRename"
           />
         </span>
         <span v-show="!list.renaming">{{ list.name }}</span>
@@ -78,6 +80,10 @@ export default {
       list.renaming = true
       await this.$nextTick()
       this.$refs.renamer[index].focus()
+    },
+    endRename() {
+      this.list.renaming = false
+      this.$emit('export')
     },
   },
 }
