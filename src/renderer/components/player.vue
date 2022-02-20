@@ -20,7 +20,7 @@
       <div class="between">
         <div class="left">
           <input
-            class="volume-slider"
+            class="slider"
             type="range"
             :max="500"
             :value="volume * 100"
@@ -34,7 +34,8 @@
         </div>
       </div>
       <input
-        class="time-slider"
+        class="slider"
+        :style="{ '--height': '24px' }"
         type="range"
         :max="(music?.length ?? 0) * 10"
         :value="(music?.currentTime ?? 0) * 10"
@@ -88,6 +89,23 @@ export default {
   align-items: center;
   .info {
     height: 64px;
+  }
+  .slider {
+    --height: 6px;
+    appearance: none;
+    background: lightgray;
+    height: var(--height);
+    margin: 8px;
+    width: 100%;
+    outline: 0;
+    overflow: hidden;
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none; // デフォルトのつまみのスタイルを解除
+      background: var(--flaxen);
+      width: 0px;
+      box-shadow: -10000px 0 0 10000px var(--flaxen);
+      height: 6px;
+    }
   }
   .control {
     width: calc(100% - 16px);
