@@ -69,9 +69,8 @@ export default {
     },
     moveList(delta) {
       this.$emit(
-        'update:current-list-index'(
-          this.currentListIndex + delta + this.lists.length
-        ) % this.lists.length
+        'update:current-list-index',
+        (this.currentListIndex + delta + this.lists.length) % this.lists.length
       )
       this.$refs.list[this.currentListIndex].$el.scrollIntoView({
         behavior: 'smooth',
