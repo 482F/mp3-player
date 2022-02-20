@@ -22,7 +22,7 @@
           }
         "
       >
-        <music-item :music="music" />
+        <music-item :music="music" @delete="$emit('delete', i)" />
       </div>
     </v-list>
   </div>
