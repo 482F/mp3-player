@@ -29,7 +29,7 @@ import CustomAudio from '@/renderer/classes/custom-audio.js'
 import Info from '@/renderer/classes/info.js'
 import MusicLists from './music-lists.vue'
 import Player from './player.vue'
-import Lrc from './lrc.vue'
+import Lrc from './lrc/lrc.vue'
 
 function shuffle(arr) {
   const rands = Array(arr.length)
@@ -143,7 +143,8 @@ export default {
       flex-shrink: 0;
     }
     .lrc {
-      flex-shrink: 0;
+      flex-grow: 1;
+      margin: 0 16px;
     }
     display: flex;
   }
