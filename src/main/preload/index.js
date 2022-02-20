@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 const fs = require('fs')
 const path = require('path')
 const JSON5 = require('json5')
+const sqlite3 = require('sqlite3')
 
 window.addEventListener('DOMContentLoaded', () => {
   //
@@ -157,6 +158,9 @@ const infoFunctions = {
   },
 }
 
+const db = new sqlite3.Database('E:\\info.mp-sq3')
+const dbExec = (name, ...args) => db[name](...args)
+
 const passObject = {
   requires: {
     listenIpc,
@@ -169,6 +173,7 @@ const passObject = {
   infoFunctions,
   JSON5,
   path,
+  dbExec,
 }
 
 Object.entries(passObject).forEach(([apiKey, api]) =>
