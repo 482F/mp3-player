@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron')
+const fs = require('fs')
 
 window.addEventListener('DOMContentLoaded', () => {
   //
@@ -27,7 +28,19 @@ const listenIpc = async (listenerName, eventName, handler) => {
   await sendIpc('main', 'listen', listenerName, eventName)
 }
 
+const readFile = async (fileName, encoding) =>
+  new Promise((resolve) =>
+    fs.readFile(fileName, encoding, (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
+    })
+  )
+
 contextBridge.exposeInMainWorld('requires', {
   listenIpc,
   sendIpc,
+  readFile,
 })
