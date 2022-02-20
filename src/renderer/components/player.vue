@@ -9,10 +9,14 @@
     <div class="control">
       <div class="center">
         <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
-        <v-icon v-show="!music?.isPlaying" @click="music.start()">
+        <v-icon
+          v-show="!music?.isPlaying"
+          @click="music.start()"
+          size="x-large"
+        >
           mdi-play
         </v-icon>
-        <v-icon v-show="music?.isPlaying" @click="music.stop()">
+        <v-icon v-show="music?.isPlaying" @click="music.stop()" size="x-large">
           mdi-pause
         </v-icon>
         <v-icon @click="$emit('skip', 1)">mdi-skip-next</v-icon>
@@ -120,6 +124,7 @@ export default {
     > * {
       width: 100%;
       display: flex;
+      align-items: center;
       > * {
         display: flex;
         justify-content: center;
