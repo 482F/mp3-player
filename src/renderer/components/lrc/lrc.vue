@@ -4,7 +4,16 @@
       <v-icon v-if="!editing" @click="editing = true"> mdi-pencil </v-icon>
       <template v-else>
         <v-icon @click="cancel"> mdi-close </v-icon>
-        <v-icon @click="save"> mdi-check </v-icon>
+        <v-icon
+          @click="
+            () => {
+              save()
+              editing = false
+            }
+          "
+        >
+          mdi-check
+        </v-icon>
       </template>
     </div>
     <div class="body" v-if="ready">
@@ -13,6 +22,7 @@
         class="lrc-edit"
         :music="music"
         v-model:raw-lyric="rawLyric"
+        @save="save"
       />
       <lrc-show class="lrc-show" :music="music" :lyric-data="lyricData" />
     </div>
@@ -54,7 +64,9 @@ export default {
             return null
           }
           const time =
-            ((Number(match[1]) * 60 + Number(match[2])) * 100 + Number(match[3])) * 10
+            ((Number(match[1]) * 60 + Number(match[2])) * 100 +
+              Number(match[3])) *
+            10
           const text = match[4]
           return {
             time,
@@ -89,7 +101,6 @@ export default {
     },
     async save() {
       this.initRawLyric = this.rawLyric
-      this.editing = false
       await this.$writeLyric(this.music.filePath, this.rawLyric)
     },
   },
@@ -110,6 +121,12 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    > * {
+      padding: 4px;
+    }
+    > .lrc-edit {
+      background-color: #eee;
+    }
   }
 }
 </style>

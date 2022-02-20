@@ -76,6 +76,8 @@ export default {
           this.setTime(index, 0)
           await this.$nextTick()
           this.setSelectedLineIndex(index + 1)
+        } else if (e.code === 'KeyS') {
+          this.$emit('save')
         }
       }
     },
