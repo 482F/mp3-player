@@ -3,19 +3,19 @@
     <div class="control">
       <v-icon v-if="!editing" @click="editing = true"> mdi-pencil </v-icon>
       <template v-else>
-        <v-icon> mdi-close </v-icon>
-        <v-icon> mdi-check </v-icon>
+        <v-icon @click="cancel"> mdi-close </v-icon>
+        <v-icon @click="save"> mdi-check </v-icon>
       </template>
     </div>
-    <template v-if="ready">
-      <lrc-edit v-if="editing" class="lrc-edit" />
-      <lrc-show
-        v-else
-        class="lrc-show"
+    <div class="body" v-if="ready">
+      <lrc-edit
+        v-if="editing"
+        class="lrc-edit"
         :music="music"
-        :lyric-data="lyricData"
+        v-model:raw-lyric="rawLyric"
       />
-    </template>
+      <lrc-show class="lrc-show" :music="music" :lyric-data="lyricData" />
+    </div>
   </div>
 </template>
 
@@ -32,6 +32,8 @@ export default {
   data() {
     return {
       editing: false,
+      initRawLyric: '',
+      rawLyric: '',
       lyricData: null,
       ready: false,
     }
@@ -40,6 +42,26 @@ export default {
     music: {
       type: Object,
       default: null,
+    },
+  },
+  computed: {
+    lyricData() {
+      return this.rawLyric
+        .split('\n')
+        .map((line) => {
+          const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/)
+          if (!match) {
+            return null
+          }
+          const time =
+            (Number(match[1]) * 60 + Number(match[2])) * 1000 + Number(match[3])
+          const text = match[4]
+          return {
+            time,
+            text,
+          }
+        })
+        .filter(Boolean)
     },
   },
   watch: {
@@ -56,24 +78,19 @@ export default {
       if (!this.music) {
         return
       }
-      const lyric = await this.$getLyric(this.music.filePath)
-      this.lyricData = lyric
-        .split('\n')
-        .map((line) => {
-          const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/)
-          if (!match) {
-            return null
-          }
-          const time =
-            (Number(match[1]) * 60 + Number(match[2])) * 1000 + Number(match[3])
-          const text = match[4]
-          return {
-            time,
-            text,
-          }
-        })
-        .filter(Boolean)
+      this.initRawLyric = this.rawLyric = await this.$readLyric(
+        this.music.filePath
+      )
       this.ready = true
+    },
+    cancel() {
+      this.rawLyric = this.initRawLyric
+      this.editing = false
+    },
+    async save() {
+      this.initRawLyric = this.rawLyric
+      this.editing = false
+      await this.$writeLyric(this.music.filePath, this.rawLyric)
     },
   },
 }
@@ -81,9 +98,18 @@ export default {
 
 <style lang="scss" scoped>
 .lrc {
-  .control {
+  display: flex;
+  flex-direction: column;
+  > .control {
     display: flex;
     justify-content: flex-end;
+  }
+  > .body {
+    min-height: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 }
 </style>
