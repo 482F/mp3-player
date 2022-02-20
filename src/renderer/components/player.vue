@@ -49,7 +49,9 @@ import CustomAudio from '@/renderer/classes/custom-audio.js'
 
 export default {
   name: 'player',
-  data() {},
+  data() {
+    return {}
+  },
   props: {
     music: {
       type: CustomAudio,
