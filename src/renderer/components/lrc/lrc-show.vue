@@ -35,7 +35,7 @@ export default {
   computed: {
     lineHeight: () => lineHeight,
     currentTime() {
-      return (this.music?.currentTime ?? 0) * 1000
+      return Math.round((this.music?.currentTime ?? 0) * 1000)
     },
     currentIndex() {
       const currentIndex =
