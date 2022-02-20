@@ -2,7 +2,7 @@
   <div class="f-main">
     <player
       :music="current.music"
-      :volume="volume"
+      :volume="info.volume ?? 1"
       @update:volume="updateVolume"
       @skip="skip"
       @shuffle="shuffle"
@@ -49,7 +49,6 @@ export default {
     return {
       info: {},
       currentMusic: null,
-      volume: 1,
       current: {},
     }
   },
@@ -95,10 +94,10 @@ export default {
       this.info.lists = lists
     },
     updateVolume(volume) {
-      this.current.music.gain = this.volume = volume
+      this.current.music.gain = this.info.volume = volume
     },
     async open(music, list, index) {
-      const newMusic = await CustomAudio.construct(music.path, this.volume)
+      const newMusic = await CustomAudio.construct(music.path, this.info.volume ?? 1)
       if (this.current.music) {
         this.current.music.stop()
         this.current.list.musics[this.current.index].isPlaying = false
