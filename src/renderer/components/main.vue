@@ -68,12 +68,6 @@ export default {
   },
   async mounted() {
     await this.initInfo()
-    dbExec('run', 'create table if not exists members(name, age)')
-    dbExec('run', 'insert into members(name, age) values(?, ?)', 'hoge', 33)
-    dbExec('run', 'insert into members(name, age) values(?, ?)', 'foo', 44)
-    dbExec('each', 'select * from members', (err, row) => {
-      console.log(`${row.name} ${row.age}`)
-    })
   },
   methods: {
     onKeydown(e) {
@@ -126,6 +120,7 @@ export default {
         droppedFiles.map((file) => file.path),
         ['mp3']
       )
+      window.info.addMusics(allPaths)
       targetList.musics.push(
         ...(await Promise.all(
           allPaths.map((path) => this.info.getMusicInfo(path))
