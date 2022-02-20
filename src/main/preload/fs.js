@@ -44,9 +44,13 @@ const stat = (path) =>
     })
   )
 
+const extPattern = /\.([^.]+)$/
+
 module.exports = {
+  existsSync: fs.existsSync,
   readFile,
   writeFile,
   readdir,
   stat,
+  extPattern,
 }
