@@ -1,6 +1,6 @@
 <template>
-  <div class="music-item">
-    <v-list-item>
+  <div class="music-item" v-intersect="onIntersect">
+    <v-list-item v-if="isIntersect">
       <div class="playing-icon">
         <v-icon v-show="music.isPlaying">mdi-play</v-icon>
       </div>
@@ -22,10 +22,20 @@
 <script>
 export default {
   name: 'music-item',
+  data() {
+    return {
+      isIntersect: false,
+    }
+  },
   props: {
     music: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    onIntersect(entries, observer) {
+      this.isIntersect = entries
     },
   },
 }
@@ -34,6 +44,7 @@ export default {
 <style lang="scss" scoped>
 .music-item {
   position: relative;
+  height: 40px;
   .v-list-item {
     .playing-icon {
       width: 32px;
