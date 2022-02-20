@@ -1,8 +1,9 @@
-const { sendIpc, listenIpc } = window.requires
+const requires = window.requires
 
 export default {
   install(app) {
-    app.config.globalProperties.$sendIpc = sendIpc
-    app.config.globalProperties.$listenIpc = listenIpc
+    for (const [name, func] of Object.entries(requires)) {
+      app.config.globalProperties['$' + name] = func
+    }
   },
 }

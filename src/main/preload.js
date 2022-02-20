@@ -1,5 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const fs = require('fs')
+const path = require('path')
+const JSON5 = require('json5')
 
 window.addEventListener('DOMContentLoaded', () => {
   //
@@ -50,8 +52,75 @@ const writeFile = async (filePath, data, options) =>
     })
   )
 
+const findInfoFilePath = (targetDirPath) => {
+  const infoPath = path.join(targetDirPath, 'info.json5')
+  if (fs.existsSync(infoPath)) {
+    return infoPath
+  }
+  const nextTargetDirPath = path.dirname(targetDirPath)
+  if (nextTargetDirPath === targetDirPath) {
+    return null
+  } else {
+    findInfoFilePath(nextTargetDirPath)
+  }
+}
+
+const readdir = (path) =>
+  new Promise((resolve, reject) =>
+    fs.readdir(path, (err, files) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(files)
+      }
+    })
+  )
+
+const stat = (path) =>
+  new Promise((resolve, reject) =>
+    fs.stat(path, (err, stats) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(stats)
+      }
+    })
+  )
+
+const storeAllFiles = async (files, targetDirPath, filterExts = null) => {
+  const children = await readdir(targetDirPath)
+  for (const child of children) {
+    const absPath = path.join(targetDirPath, child)
+    if (await stat(absPath).then((stats) => stats.isDirectory())) {
+      await storeAllFiles(files, absPath, filterExts)
+    } else {
+      if (!filterExts || filterExts.includes(child.match(/\.([^.]+)$/)[1])) {
+        files[absPath] ??= {}
+      }
+    }
+  }
+}
+
+const updateInfo = async (info, targetDirPath) => {
+  info.files ??= {}
+  await storeAllFiles(info.files, targetDirPath, ['mp3'])
+}
+
+const getInfo = async (targetDirPath) => {
+  let infoPath = findInfoFilePath(targetDirPath)
+  if (!infoPath) {
+    infoPath = path.join(targetDirPath, 'info.json5')
+    writeFile(infoPath, '{}')
+  }
+  const info = JSON5.parse(await readFile(infoPath))
+  await updateInfo(info, targetDirPath)
+  await writeFile(infoPath, JSON.stringify(info, null, '  '))
+  return info
+}
+
 contextBridge.exposeInMainWorld('requires', {
   listenIpc,
   sendIpc,
   readFile,
+  getInfo,
 })
