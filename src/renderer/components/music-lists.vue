@@ -10,12 +10,7 @@
         :key="i"
         @mousedown="currentListIndex = i"
         @dblclick="renameList(list, i)"
-        @click.middle="
-          () => {
-            lists.splice(i, 1)
-            $emit('export')
-          }
-        "
+        @click.middle="lists.splice(i, 1)"
       >
         <span v-show="list.renaming">
           <input
@@ -83,7 +78,6 @@ export default {
     },
     endRename(list) {
       list.renaming = false
-      this.$emit('export')
     },
   },
 }

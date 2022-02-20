@@ -28,6 +28,7 @@
           />
         </div>
         <div class="right">
+          <v-icon @click="$emit('export')">mdi-content-save</v-icon>
           <v-icon>mdi-sync</v-icon>
           <v-icon @click="$emit('shuffle')">mdi-shuffle</v-icon>
         </div>
