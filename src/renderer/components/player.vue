@@ -75,11 +75,12 @@ export default {
       }
     },
     formatTime(time) {
-      const f = (num) => num.toString().padStart(2, '0')
+      const f = (num) => Math.floor(num).toString().padStart(2, '0')
       const hour = Math.floor(time / (60 * 60))
-      const minute = f(Math.floor((time % (60 * 60)) / 60))
-      const second = f(Math.floor(time % 60))
-      return `${hour ? hour + ':' : ''}${minute}:${second}`
+      const minute = f((time % (60 * 60)) / 60)
+      const second = f(time % 60)
+      const millisecond = f((time * 100) % 100)
+      return `${hour ? hour + ':' : ''}${minute}:${second}.${millisecond}`
     },
   },
 }
