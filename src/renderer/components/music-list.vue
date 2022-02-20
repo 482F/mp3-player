@@ -9,7 +9,7 @@
   >
     <v-list density="compact">
       <div
-        class="item"
+        class="music-item"
         v-for="(music, i) of musics"
         :key="i"
         :class="{ selected: music.selected }"
@@ -22,22 +22,20 @@
           }
         "
       >
-        <div>
-          <v-list-item>
-            <div class="playing-icon">
-              <v-icon v-show="music.isPlaying">mdi-play</v-icon>
-            </div>
-            <div>{{ music.name }}</div>
-          </v-list-item>
-        </div>
+        <music-item :music="music" />
       </div>
     </v-list>
   </div>
 </template>
 
 <script>
+import MusicItem from './music-item.vue'
+
 export default {
   name: 'music-list',
+  components: {
+    MusicItem,
+  },
   props: {
     musics: {
       type: Array,
@@ -83,13 +81,10 @@ export default {
 
 <style lang="scss" scoped>
 .music-list {
-  .item {
+  .music-item {
     user-select: none;
     &.selected {
       background-color: var(--flaxen);
-    }
-    .playing-icon {
-      width: 32px;
     }
   }
 }
