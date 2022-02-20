@@ -19,7 +19,12 @@
         @open="open"
         @delete-item="deleteItem"
       />
-      <lrc class="lrc" :key="current.music?.filePath" :music="current.music" />
+      <lrc
+        class="lrc"
+        :key="current.music?.filePath"
+        :music="current.music"
+        v-model:editing="editing"
+      />
     </div>
   </div>
 </template>
@@ -56,6 +61,7 @@ export default {
       info: {},
       currentMusic: null,
       current: {},
+      editing: false,
     }
   },
   async mounted() {
@@ -141,7 +147,12 @@ export default {
       this.current.music.onended = () => this.onended()
     },
     async onended() {
-      await this.skip(1)
+      if (this.info.loop || this.editing) {
+        this.current.music.stop()
+        this.current.music.start(0)
+      } else {
+        await this.skip(1)
+      }
     },
   },
 }
