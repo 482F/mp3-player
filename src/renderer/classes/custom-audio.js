@@ -38,7 +38,7 @@ export default class CustomAudio {
   start(offset) {
     offset = offset ? offset * 1000 : this._currentTime ?? 0 * 1000
     this._startTime = new Date().getTime() - offset
-    this._intervalId = setInterval(() => this._interval(), 100)
+    this._intervalId = setInterval(() => this._interval(), 10)
     this._source.start(0, offset / 1000)
     this.isPlaying = true
   }
@@ -60,7 +60,7 @@ export default class CustomAudio {
   }
 
   get currentTime() {
-    return Math.floor((this._currentTime ?? 0) / 100) / 10
+    return Math.floor((this._currentTime ?? 0) / 10) / 100
   }
   set currentTime(value) {
     this._currentTime = value * 1000
