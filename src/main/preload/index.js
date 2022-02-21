@@ -3,6 +3,7 @@ const path = require('path')
 const JSON5 = require('json5')
 const info = require('./info.js')
 const fs = require('./fs.js')
+const throttle = require('lodash/throttle')
 
 window.addEventListener('DOMContentLoaded', () => {
   //
@@ -93,6 +94,7 @@ const passObject = {
     sendIpc,
     readFile: fs.readFile,
     getAllMusicPaths,
+    throttle,
   },
   infoFunctions,
   JSON5,

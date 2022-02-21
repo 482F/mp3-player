@@ -1,15 +1,22 @@
 const info = window.info
+const throttle = window.requires.throttle
 
 export default class Info {
   constructor() {}
   async init() {
-    const settings = await info.settings.setIfNeededAndGet({
+    const defaultSettings = {
       volume: 1,
       currentListIndex: 0,
       loop: false,
-    })
+    }
+    const settings = await info.settings.setIfNeededAndGet(defaultSettings)
     Object.entries(settings).forEach(([key, value]) => {
       this[`_${key}`] = value
+
+      const camelKey = `${key[0].toUpperCase()}${key.slice(1)}`
+      this[`save${camelKey}`] = throttle((value) => {
+        info.settings.set({ key: value })
+      }, 1000)
     })
     this.playlists = await info.getPlaylists()
   }
@@ -36,7 +43,7 @@ export default class Info {
   }
   set loop(value) {
     this._loop = value
-    info.settings.set({ loop: value })
+    this.saveLoop(value)
   }
 
   get volume() {
@@ -44,7 +51,7 @@ export default class Info {
   }
   set volume(value) {
     this._volume
-    info.settings.set({ volume: value })
+    this.saveVolume(value)
   }
 
   get currentListIndex() {
@@ -52,6 +59,6 @@ export default class Info {
   }
   set currentListIndex(value) {
     this._currentListIndex = value
-    info.settings.set({ currentListIndex: value })
+    this.saveCurrentListIndex(value)
   }
 }
