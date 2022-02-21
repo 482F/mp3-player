@@ -47,6 +47,9 @@
     "productName": "mp3-player",
     "files": [
       "dist/**/*"
-    ]
+    ],
+    "win": {
+      "icon": "public/icon.png"
+    }
   }
 }
