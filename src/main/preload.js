@@ -108,13 +108,9 @@ const getAllPaths = async (targetPaths, filterExts = null) => {
 }
 
 const infoFunctions = {
-  async export(info, infoKeys) {
-    const json = JSON.strinfigy(
-      infoKeys
-        .map((key) => ({ [key]: info[key] }))
-        .reduce((all, part) => (all = { ...all, ...part }))
-    )
-    await writeFile(json, info.infoPath)
+  async export(infoPath, info) {
+    const json = JSON5.stringify(info, null, '  ')
+    await writeFile(infoPath, json)
   },
 }
 
@@ -127,6 +123,7 @@ const passObject = {
   },
   infoFunctions,
   JSON5,
+  path,
 }
 
 Object.entries(passObject).forEach(([apiKey, api]) =>
