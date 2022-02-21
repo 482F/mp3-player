@@ -2,6 +2,17 @@ const id3 = require('node-id3')
 const mp3Duration = require('mp3-duration')
 const fs = require('./fs.js')
 
+function snakeKeyToCamel(obj) {
+  const newObj = {}
+  Object.keys(obj).forEach((snakeKey) => {
+    const camelKey = snakeKey.replace(/_./g, function (s) {
+      return s.charAt(1).toUpperCase()
+    })
+    newObj[camelKey] = obj[snakeKey]
+  })
+  return newObj
+}
+
 function toAsyncCallback(func) {
   return new Promise((resolve, reject) => {
     func((err, result) => {
@@ -76,7 +87,8 @@ const db = createDbProxy('E:\\info.mp-sq3')
     id            INTEGER UNIQUE NOT NULL PRIMARY KEY          ,
     name          TEXT    UNIQUE NOT NULL                      ,
     is_display    INTEGER        NOT NULL             DEFAULT 1,
-    playing_index INTEGER
+    display_idx   INTEGER UNIQUE NOT NULL                      ,
+    playing_idx   INTEGER
   );`)
   await db.run(`
   CREATE TABLE IF NOT EXISTS playlists_musics (
@@ -128,6 +140,92 @@ info.addMusics = async (paths) => {
       lyric
     ) VALUES ${repeatPlaceholder('(?, ?, ?, ?, ?, ?)', paths.length)}`,
     ...values.flat()
+  )
+}
+
+info.setSettings = async (obj) => {
+  if (!Object.keys(obj).length) {
+    return
+  }
+  Object.entries(obj).forEach(([key, value]) =>
+    db.run(`UPDATE settings SET value = ? WHERE key = ?`, value.toString(), key)
+  )
+}
+
+info.insertSettings = async (obj) => {
+  if (!Object.keys(obj).length) {
+    return
+  }
+  const values = Object.entries(obj).map(([key, value]) => [
+    key,
+    value.toString(),
+  ])
+  return await db.run(
+    `INSERT OR IGNORE INTO settings (
+      key,
+      value
+    ) VALUES ${repeatPlaceholder('(?, ?)', values.length)}`,
+    ...values.flat()
+  )
+}
+
+info.getSettings = async () => {
+  return await db.all(`SELECT * FROM settings`).then((result) =>
+    result
+      .map(({ key, value }) => {
+        const converters = {
+          volume: Number,
+          currentListIndex: Number,
+          loop: (v) => v === 'true',
+        }
+        return { [key]: (converters[key] ?? ((v) => v))(value) }
+      })
+      .reduce((all, part) => ({ ...all, ...part }), {})
+  )
+}
+
+info.setSettingsIfNeededAndGet = async (obj) => {
+  const clonedObj = { ...obj }
+  const settings = await info.getSettings()
+  Object.entries(clonedObj).forEach(([key, value]) => {
+    if (settings[key] === undefined) {
+      return
+    }
+    delete clonedObj[key]
+  })
+  await info.insertSettings(clonedObj)
+  return {
+    ...settings,
+    ...clonedObj,
+  }
+}
+
+info.insertPlaylists = async (...values) => {
+  return await db.run(
+    `INSERT OR IGNORE INTO playlists (
+      name,
+      display_idx
+    ) VALUES ${repeatPlaceholder('(?, ?)', values.length)}`,
+    ...values.flat()
+  )
+}
+
+info.getPlaylists = async () => {
+  return await Promise.all(
+    (await db.all(`SELECT * FROM playlists`))
+      .map(snakeKeyToCamel)
+      .map(async (playlist) => {
+        playlist.isDisplay = Boolean(playlist.isDisplay)
+        // const musicIds = await db.all(
+        //   `SELECT * FROM playlists_musics
+        //     WHERE playlist_id = ?
+        //     ORDER BY idx ASC`,
+        //   playlist.id
+        // )
+
+        // console.log(musicIds)
+        return playlist
+      })
   )
 }
 
