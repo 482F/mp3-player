@@ -1,13 +1,15 @@
 <template>
   <div
-    @drop.prevent="
-      (...args) => $emit('insert-musics', ...args)
-    "
+    @drop.prevent="(...args) => $emit('insert-musics', ...args)"
     @dragenter.prevent
     @dragover.prevent
   >
     <v-list density="compact">
-      <div v-for="(music, i) of musics" :key="i">
+      <div
+        v-for="(music, i) of musics"
+        :key="i"
+        @dblclick="$emit('open', music)"
+      >
         <v-list-item>{{ music.name }}</v-list-item>
       </div>
     </v-list>
