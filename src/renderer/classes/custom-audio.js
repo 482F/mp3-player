@@ -2,6 +2,11 @@ const { readFile } = window.requires
 
 export default class CustomAudio {
   constructor() {}
+  static async construct(path) {
+    const audio = new CustomAudio()
+    await audio.init(path)
+    return audio
+  }
   async init(path) {
     this.file = await readFile(path)
     const buffer = this.file.buffer
@@ -12,5 +17,11 @@ export default class CustomAudio {
     this.source = audioCtx.createBufferSource()
     this.source.buffer = audioBuffer
     this.source.connect(audioCtx.destination)
+  }
+  start() {
+    this.source.start()
+  }
+  stop() {
+    this.source.stop()
   }
 }

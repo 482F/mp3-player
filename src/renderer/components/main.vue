@@ -23,6 +23,7 @@ export default {
     return {
       musics: [],
       info: {},
+      currentMusic: null,
     }
   },
   async mounted() {
@@ -47,9 +48,9 @@ export default {
       this.info.export()
     },
     async open(music) {
-      const audio = new CustomAudio()
-      await audio.init(music.path)
-      audio.source.start(0)
+      this.currentMusic?.stop?.()
+      this.currentMusic = await CustomAudio.construct(music.path)
+      this.currentMusic.start()
     },
   },
 }
