@@ -3,7 +3,7 @@ const info = window.info
 export default class Info {
   constructor() {}
   async init() {
-    const settings = await info.setSettingsIfNeededAndGet({
+    const settings = await info.settings.setIfNeededAndGet({
       volume: 1,
       currentListIndex: 0,
       loop: false,
@@ -36,7 +36,7 @@ export default class Info {
   }
   set loop(value) {
     this._loop = value
-    info.setSettings({ loop: value })
+    info.settings.set({ loop: value })
   }
 
   get volume() {
@@ -44,7 +44,7 @@ export default class Info {
   }
   set volume(value) {
     this._volume
-    info.setSettings({ volume: value })
+    info.settings.set({ volume: value })
   }
 
   get currentListIndex() {
@@ -52,6 +52,6 @@ export default class Info {
   }
   set currentListIndex(value) {
     this._currentListIndex = value
-    info.setSettings({ currentListIndex: value })
+    info.settings.set({ currentListIndex: value })
   }
 }

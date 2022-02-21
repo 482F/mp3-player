@@ -143,7 +143,9 @@ info.addMusics = async (paths) => {
   )
 }
 
-info.setSettings = async (obj) => {
+info.settings = {}
+
+info.settings.set = async (obj) => {
   if (!Object.keys(obj).length) {
     return
   }
@@ -152,7 +154,7 @@ info.setSettings = async (obj) => {
   )
 }
 
-info.insertSettings = async (obj) => {
+info.settings.insert = async (obj) => {
   if (!Object.keys(obj).length) {
     return
   }
@@ -169,7 +171,7 @@ info.insertSettings = async (obj) => {
   )
 }
 
-info.getSettings = async () => {
+info.settings.get = async () => {
   return await db.all(`SELECT * FROM settings`).then((result) =>
     result
       .map(({ key, value }) => {
@@ -184,16 +186,16 @@ info.getSettings = async () => {
   )
 }
 
-info.setSettingsIfNeededAndGet = async (obj) => {
+info.settings.setIfNeededAndGet = async (obj) => {
   const clonedObj = { ...obj }
-  const settings = await info.getSettings()
+  const settings = await info.settings.get()
   Object.entries(clonedObj).forEach(([key, value]) => {
     if (settings[key] === undefined) {
       return
     }
     delete clonedObj[key]
   })
-  await info.insertSettings(clonedObj)
+  await info.settings.insert(clonedObj)
   return {
     ...settings,
     ...clonedObj,
