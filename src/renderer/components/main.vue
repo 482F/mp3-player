@@ -13,6 +13,7 @@
       @update:lists="updateLists"
       @insert-musics="insertMusics"
       @open="open"
+      @export="info.export()"
     />
   </div>
 </template>

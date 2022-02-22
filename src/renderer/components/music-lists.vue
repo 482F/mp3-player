@@ -1,20 +1,33 @@
 <template>
   <div class="music-lists">
-    <div
-      class="lists"
-      @mousewheel="(e) => moveList(Math.sign(-e.wheelDelta))"
-    >
-      <v-btn
-        flat
+    <div class="lists" @mousewheel="(e) => moveList(Math.sign(-e.wheelDelta))">
+      <v-list-item
         ref="list"
-        :color="currentListIndex === i ? '#C7B897' : '#eee'"
+        class="item"
+        :class="currentListIndex === i ? 'current' : ''"
         :rounded="0"
         v-for="(list, i) of lists"
         :key="i"
-        @click="currentListIndex = i"
+        @mousedown="currentListIndex = i"
+        @dblclick="renameList(list, i)"
       >
-        {{ list.name }}
-      </v-btn>
+        <span v-show="list.renaming">
+          <input
+            ref="renamer"
+            class="renamer"
+            type="text"
+            :value="list.name"
+            @input="(e) => (list.name = e.target.value)"
+            @blur="
+              () => {
+                list.renaming = false
+                $emit('export')
+              }
+            "
+          />
+        </span>
+        <span v-show="!list.renaming">{{ list.name }}</span>
+      </v-list-item>
       <v-icon @click="addList">mdi-plus</v-icon>
     </div>
     <music-list
@@ -61,6 +74,11 @@ export default {
         behavior: 'smooth',
       })
     },
+    async renameList(list, index) {
+      list.renaming = true
+      await this.$nextTick()
+      this.$refs.renamer[index].focus()
+    },
   },
 }
 </script>
@@ -79,6 +97,13 @@ export default {
     &::-webkit-scrollbar {
       width: 0px !important;
       height: 0px !important;
+    }
+    .item {
+      background-color: #eee;
+      user-select: none;
+      &.current {
+        background-color: #c7b897;
+      }
     }
   }
   .music-list {
