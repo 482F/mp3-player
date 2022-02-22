@@ -45,6 +45,7 @@ export default {
 <style lang="scss">
 html {
   overflow: hidden !important;
+  --flaxen: #C7B897;
   > body {
     background-color: #ffffff00;
     .v-application {
