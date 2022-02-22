@@ -9,9 +9,12 @@
     <div class="control">
       <div class="center">
         <v-icon>mdi-skip-previous</v-icon>
-        <v-icon>mdi-stop</v-icon>
-        <v-icon>mdi-play</v-icon>
-        <v-icon>mdi-pause</v-icon>
+        <v-icon v-show="!music?.isPlaying" @click="music.start()">
+          mdi-play
+        </v-icon>
+        <v-icon v-show="music?.isPlaying" @click="music.stop()">
+          mdi-pause
+        </v-icon>
         <v-icon>mdi-skip-next</v-icon>
       </div>
       <div class="between">
