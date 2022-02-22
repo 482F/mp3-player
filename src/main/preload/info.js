@@ -339,4 +339,11 @@ info.musics.insertIfNeededAndGet = async (paths) => {
   return pathAndMusics.map(([p, music]) => music ?? musicDict[p])
 }
 
+info.musics.updateLyric = async (path, lyric) => {
+  await Promise.all([
+    writeLyric(path, lyric),
+    db.run(`UPDATE musics SET lyric = ? WHERE path = ?`, lyric, path),
+  ])
+}
+
 module.exports = info
