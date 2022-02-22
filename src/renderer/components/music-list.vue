@@ -23,7 +23,12 @@
         "
       >
         <div>
-          <v-list-item>{{ music.name }}</v-list-item>
+          <v-list-item>
+            <div class="playing-icon">
+              <v-icon v-show="music.isPlaying">mdi-play</v-icon>
+            </div>
+            <div>{{ music.name }}</div>
+          </v-list-item>
         </div>
       </div>
     </v-list>
@@ -75,9 +80,12 @@ export default {
 .music-list {
   .item {
     user-select: none;
-  }
-  .item.selected {
-    background-color: var(--flaxen);
+    &.selected {
+      background-color: var(--flaxen);
+    }
+    .playing-icon {
+      width: 32px;
+    }
   }
 }
 </style>
