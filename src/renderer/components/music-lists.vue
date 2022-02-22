@@ -1,8 +1,12 @@
 <template>
   <div class="music-lists">
-    <div class="lists">
+    <div
+      class="lists"
+      @mousewheel="(e) => moveList(Math.sign(-e.wheelDelta))"
+    >
       <v-btn
         flat
+        ref="list"
         :color="currentListIndex === i ? '#ddd' : 'white'"
         :rounded="0"
         v-for="(list, i) of lists"
@@ -33,7 +37,6 @@ export default {
   data() {
     return {
       currentListIndex: 0,
-      a: undefined,
     }
   },
   props: {
@@ -51,6 +54,13 @@ export default {
     addList() {
       this.$emit('update:lists', [...this.lists, { name: 'new', musics: [] }])
     },
+    moveList(delta) {
+      this.currentListIndex =
+        (this.currentListIndex + delta + this.lists.length) % this.lists.length
+      this.$refs.list[this.currentListIndex].$el.scrollIntoView({
+        behavior: 'smooth',
+      })
+    },
   },
 }
 </script>
@@ -63,6 +73,13 @@ export default {
   .lists {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    &::-webkit-scrollbar {
+      width: 0px !important;
+      height: 0px !important;
+    }
   }
   .music-list {
     flex-grow: 1;
