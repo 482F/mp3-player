@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import CustomAudio from '@/renderer/classes/custom-audio.js'
+import Music from '@/renderer/classes/music.js'
 
 export default {
   name: 'player',
@@ -64,7 +64,7 @@ export default {
   },
   props: {
     music: {
-      type: CustomAudio,
+      type: Music,
       default: null,
     },
     volume: {

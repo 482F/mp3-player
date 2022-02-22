@@ -43,7 +43,6 @@ export default {
   },
   data() {
     return {
-      initRawLyric: '',
       rawLyric: '',
       lyricData: null,
       ready: false,
@@ -95,18 +94,15 @@ export default {
       if (!this.music) {
         return
       }
-      this.initRawLyric = this.rawLyric = await this.$readLyric(
-        this.music.filePath
-      )
+      this.rawLyric = this.music.lyric
       this.ready = true
     },
     cancel() {
-      this.rawLyric = this.initRawLyric
+      this.rawLyric = this.music.lyric
       this.$emit('update:editing', false)
     },
     async save() {
-      this.initRawLyric = this.rawLyric
-      await this.$writeLyric(this.music.filePath, this.rawLyric)
+      this.music.lyric = this.rawLyric
     },
   },
 }

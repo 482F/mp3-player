@@ -19,7 +19,7 @@
       />
       <lrc
         class="lrc"
-        :key="current.music?.filePath"
+        :key="current.music?.path"
         :music="current.music"
         v-model:editing="editing"
       />
@@ -122,19 +122,6 @@ export default {
       await info.init()
       this.$store.dispatch('setInfo', info)
     },
-    async insertMusics(targetList, droppedFiles) {
-      console.log({ targetList, droppedFiles })
-      const allPaths = await this.$getAllMusicPaths(
-        droppedFiles.map((file) => file.path),
-        ['mp3']
-      )
-      window.info.addMusics(allPaths)
-      targetList.musics.push(
-        ...(await Promise.all(
-          allPaths.map((path) => this.info.getMusicInfo(path))
-        ))
-      )
-    },
     updateLists(lists) {
       this.info.lists = lists
     },
@@ -146,7 +133,7 @@ export default {
         this.current.music.stop()
       }
       this.current.music = music
-      await music.open()
+      await music.open(this.info.volume)
       this.current.music.start()
       this.current.music.onended = () => this.onended()
     },
