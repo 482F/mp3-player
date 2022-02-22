@@ -26,7 +26,7 @@
         </div>
         <div class="right">
           <v-icon>mdi-sync</v-icon>
-          <v-icon>mdi-shuffle</v-icon>
+          <v-icon @click="$emit('shuffle')">mdi-shuffle</v-icon>
         </div>
       </div>
       <input
