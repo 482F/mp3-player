@@ -6,7 +6,7 @@ export default class Playlist {
   constructor({ id, name, isDisplay, displayIdx, playingIdx, musics }) {
     this._id = id
     this._name = name
-    this._idDisplay = isDisplay
+    this._isDisplay = isDisplay
     this._displayIdx = displayIdx
     this._playingIdx = playingIdx
     this._musics = musics.map((music) => new Music(music))

@@ -9,11 +9,11 @@
         class="item"
         :class="currentListIndex === i ? 'current' : ''"
         :rounded="0"
-        v-for="(list, i) of lists"
+        v-for="(list, i) of lists.filter((list) => list.isDisplay)"
         :key="i"
-        @mousedown="$emit('update:current-list-index', i)"
+        @mousedown.left="$emit('update:current-list-index', i)"
         @dblclick="renameList(list, i)"
-        @click.middle="lists.splice(i, 1)"
+        @click.middle="list.isDisplay = false"
       >
         <span v-show="list.renaming">
           <input
