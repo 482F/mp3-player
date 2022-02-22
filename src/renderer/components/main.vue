@@ -73,7 +73,9 @@ export default {
     },
     async onended() {
       await this.open(
-        this.current.list.musics[this.current.index % this.current.list.musics.length],
+        this.current.list.musics[
+          this.current.index % this.current.list.musics.length
+        ],
         this.current.list,
         this.current.index + 1
       )
@@ -84,15 +86,13 @@ export default {
 
 <style lang="scss" scoped>
 .f-main {
-  min-height: 100%;
+  height: 100%;
   min-width: 100%;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
   .music-lists {
     flex-grow: 1;
-    height: 100%;
-    width: 100%;
   }
 }
 </style>

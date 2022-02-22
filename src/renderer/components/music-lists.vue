@@ -57,11 +57,16 @@ export default {
 
 <style lang="scss" scoped>
 .music-lists {
+  min-height: 0;
   display: flex;
   flex-direction: column;
   .lists {
     display: flex;
     align-items: center;
+  }
+  .music-list {
+    flex-grow: 1;
+    overflow-y: scroll;
   }
 }
 </style>
