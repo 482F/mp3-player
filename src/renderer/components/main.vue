@@ -2,7 +2,7 @@
   <div class="f-main" tabindex="0" @keydown="onKeydown">
     <player
       :music="current.music"
-      :volume="info.volume ?? 1"
+      :volume="info.volume"
       v-model:loop="info.loop"
       @update:volume="updateVolume"
       @skip="skip"
