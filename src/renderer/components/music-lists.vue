@@ -72,7 +72,11 @@ export default {
   },
   methods: {
     addList() {
-      this.info.insertPlaylists(['new'])
+      let i = 0
+      while (this.lists.find((list) => list.name === 'new' + i)) {
+        i++
+      }
+      this.info.insertPlaylists(['new' + i])
     },
     moveList(delta) {
       this.$emit(

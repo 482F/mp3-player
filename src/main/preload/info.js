@@ -187,7 +187,7 @@ info.musics.getByIds = async (ids) => {
 info.playlists = {}
 
 info.playlists.insert = async (names) => {
-  let count = await db.get(`SELECT COUNT(*) FROM playlists`)
+  let count = (await db.get(`SELECT COUNT(*) FROM playlists`))['COUNT(*)']
   count = isNaN(count) ? 0 : count
   const values = names.map((name) => [name, true, count++])
   await db.run(
