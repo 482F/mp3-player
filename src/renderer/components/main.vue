@@ -1,6 +1,6 @@
 <template>
   <div class="f-main">
-    <player :music="currentMusic" />
+    <player :music="currentMusic" :volume="volume" @update:volume="updateVolume" />
     <music-list
       class="music-list"
       :musics="musics"
@@ -27,6 +27,7 @@ export default {
       musics: [],
       info: {},
       currentMusic: null,
+      volume: 1,
     }
   },
   async mounted() {
@@ -50,10 +51,13 @@ export default {
       )
       this.info.export()
     },
+    updateVolume(volume) {
+      this.currentMusic.gain = this.volume = volume
+    },
     async open(music, index) {
       this.currentIndex = index
       this.currentMusic?.stop?.()
-      this.currentMusic = await CustomAudio.construct(music.path)
+      this.currentMusic = await CustomAudio.construct(music.path, this.volume)
       this.currentMusic.start()
       this.currentMusic.onended = () => this.onended()
     },
