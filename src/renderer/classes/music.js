@@ -1,3 +1,4 @@
+const { readFile } = window.requires
 const info = window.info
 const path = window.path
 
@@ -11,6 +12,74 @@ export default class Playlist {
     this._album = album
     this._lyric = lyric
   }
+
+  async open(gain = 1) {
+    this.file = await readFile(path)
+    const buffer = this.file.buffer
+    this._audioCtx = new AudioContext()
+    this._audioBuffer = await new Promise((resolve) =>
+      this._audioCtx.decodeAudioData(buffer, resolve)
+    )
+    this._createSource()
+    this.gain = gain
+  }
+
+  stop() {
+    this.pause()
+    delete this.file
+  }
+
+  _createSource() {
+    this._source = this._audioCtx.createBufferSource()
+    this._source.buffer = this._audioBuffer
+    this._gainNode = this._audioCtx.createGain()
+    this._source.connect(this._gainNode)
+    this._gainNode.connect(this._audioCtx.destination)
+  }
+
+  _interval() {
+    this._currentTime = new Date().getTime() - this._startTime
+    if (this.length <= this.currentTime) {
+      this.pause()
+      this.onended()
+    }
+  }
+
+  get gain() {
+    return this._gainNode.gain.value
+  }
+  set gain(value) {
+    this._gainNode.gain.value = value
+  }
+
+  get currentTime() {
+    return Math.floor((this._currentTime ?? 0) / 10) / 100
+  }
+  set currentTime(value) {
+    this._currentTime = value * 1000
+    if (this.isPlaying) {
+      this.pause()
+      this.start(value)
+    }
+  }
+
+  start(offset) {
+    offset = offset !== undefined ? offset * 1000 : this._currentTime ?? 0 * 1000
+    this._startTime = new Date().getTime() - offset
+    this._intervalId = setInterval(() => this._interval(), 10)
+    this._source.start(0, offset / 1000)
+    this.isPlaying = true
+  }
+  pause() {
+    if (this.isPlaying) {
+      clearInterval(this._intervalId)
+      this._intervalId = null
+      this._source.stop()
+      this._createSource()
+      this.isPlaying = false
+    }
+  }
+
 
   get id() {
     return this._id
