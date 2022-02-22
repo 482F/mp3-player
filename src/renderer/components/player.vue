@@ -77,8 +77,6 @@ export default {
 <style lang="scss" scoped>
 .f-player {
   height: 128px;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
   display: flex;
   flex-direction: column;
   align-items: center;
