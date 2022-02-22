@@ -7,7 +7,6 @@
       @update:volume="updateVolume"
       @skip="skip"
       @shuffle="shuffle"
-      @export="info.export()"
     />
     <div class="content">
       <music-lists
@@ -55,7 +54,6 @@ export default {
   },
   data() {
     return {
-      info: {},
       currentMusic: null,
       current: {},
       editing: false,
