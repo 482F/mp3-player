@@ -1,6 +1,8 @@
 <template>
   <div
-    @drop.prevent="(...args) => $emit('insert-musics', ...args)"
+    @drop.prevent="
+      (e) => $emit('insert-musics', [...(e.dataTransfer.files ?? [])])
+    "
     @dragenter.prevent
     @dragover.prevent
   >

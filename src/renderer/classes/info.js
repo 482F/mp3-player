@@ -2,7 +2,7 @@ const { readFile } = window.requires
 const iF = window.infoFunctions
 const JSON5 = window.JSON5
 
-const infoKeys = ['files']
+const infoKeys = ['files', 'lists']
 
 export default class Info {
   constructor() {}
