@@ -4,6 +4,7 @@
       :music="current.music"
       :volume="volume"
       @update:volume="updateVolume"
+      @skip="skip"
       @shuffle="shuffle"
     />
     <music-lists
@@ -64,6 +65,16 @@ export default {
       )
       this.info.export()
     },
+    async skip(delta) {
+      const nextIndex =
+        (this.current.index + delta + this.current.list.musics.length) %
+        this.current.list.musics.length
+      await this.open(
+        this.current.list.musics[nextIndex],
+        this.current.list,
+        nextIndex
+      )
+    },
     async initInfo() {
       this.info = new Info()
       this.info.import('E:\\info.mp5')
@@ -101,12 +112,7 @@ export default {
       this.current.music.onended = () => this.onended()
     },
     async onended() {
-      const nextIndex = this.current.index + 1
-      await this.open(
-        this.current.list.musics[nextIndex % this.current.list.musics.length],
-        this.current.list,
-        nextIndex
-      )
+      await this.skip(1)
     },
   },
 }

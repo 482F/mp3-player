@@ -8,14 +8,14 @@
     </div>
     <div class="control">
       <div class="center">
-        <v-icon>mdi-skip-previous</v-icon>
+        <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
         <v-icon v-show="!music?.isPlaying" @click="music.start()">
           mdi-play
         </v-icon>
         <v-icon v-show="music?.isPlaying" @click="music.stop()">
           mdi-pause
         </v-icon>
-        <v-icon>mdi-skip-next</v-icon>
+        <v-icon @click="$emit('skip', 1)">mdi-skip-next</v-icon>
       </div>
       <div class="between">
         <div class="left">
