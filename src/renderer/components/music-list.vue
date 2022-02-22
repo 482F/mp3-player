@@ -13,11 +13,17 @@
         v-for="(music, i) of musics"
         :key="i"
         :class="{ selected: selectedIndice.includes(i) }"
-        @click="(e) => select(e, i)"
-        @dblclick="$emit('open', music, i)"
+        @mousedown="(e) => select(e, i)"
+        @dblclick="
+          (e) => {
+            if (!e.shiftKey && !e.ctrlKey) {
+              $emit('open', music, i)
+            }
+          }
+        "
       >
         <div>
-          <v-list-item :value="music">{{ music.name }}</v-list-item>
+          <v-list-item>{{ music.name }}</v-list-item>
         </div>
       </div>
     </v-list>
@@ -39,19 +45,26 @@ export default {
     }
   },
   methods: {
-    select(e, i) {
-      if (e.shiftKey) {
+    select({ shiftKey, ctrlKey }, index) {
+      if (shiftKey) {
         const start = this.selectedIndice.at(-1)
-        const end = i
+        const end = index
         const sign = Math.sign(end - start)
-        const newIndice = Array((end - start) * sign + 1)
+        const newIndice = Array((end - start) * sign)
           .fill(0)
-          .map((_, i) => sign * i + start)
+          .map((_, index) => sign * (index + 1) + start)
         this.selectedIndice.push(...newIndice)
-      } else if (e.ctrlKey) {
-        this.selectedIndice.push(i)
+      } else if (ctrlKey) {
+        const targetIndex = this.selectedIndice.findIndex(
+          (selectedIndex) => selectedIndex === index
+        )
+        if (targetIndex === -1) {
+          this.selectedIndice.push(index)
+        } else {
+          this.selectedIndice.splice(targetIndex, 1)
+        }
       } else {
-        this.selectedIndice = [i]
+        this.selectedIndice = [index]
       }
     },
   },
