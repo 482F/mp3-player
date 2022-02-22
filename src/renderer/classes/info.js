@@ -1,3 +1,5 @@
+import Playlist from './playlist.js'
+
 const info = window.info
 const throttle = window.requires.throttle
 
@@ -9,7 +11,7 @@ export default class Info {
       currentListIndex: 0,
       loop: false,
     }
-    const settings = await info.settings.setIfNeededAndGet(defaultSettings)
+    const settings = await info.settings.insertIfNeededAndGet(defaultSettings)
     Object.entries(settings).forEach(([key, value]) => {
       this[`_${key}`] = value
 
@@ -18,24 +20,15 @@ export default class Info {
         info.settings.set({ key: value })
       }, 1000)
     })
-    this.playlists = await info.getPlaylists()
+    this._playlists = await this.getAllPlaylists()
   }
-  async insertPlaylists(...values) {
-    return await info.insertPlaylists(...values)
+  async insertPlaylists(names) {
+    this._playlists.push(
+      ...(await info.playlists.insert(names)).map((obj) => new Playlist(obj))
+    )
   }
-  async getPlaylists() {
-    this.playlists = await info.getPlaylists()
-  }
-  async getMusics(filePaths) {
-    if (!this.files[filePath]) {
-      this.files[filePath] = {
-        name: path.basename(filePath).replace(/\.[^.]+/, ''),
-      }
-    }
-    return {
-      path: filePath,
-      ...this.files[filePath],
-    }
+  async getAllPlaylists() {
+    return (await info.playlists.getAll()).map((obj) => new Playlist(obj))
   }
 
   get loop() {
@@ -60,5 +53,9 @@ export default class Info {
   set currentListIndex(value) {
     this._currentListIndex = value
     this.saveCurrentListIndex(value)
+  }
+
+  get playlists() {
+    return this._playlists
   }
 }

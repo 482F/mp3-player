@@ -111,38 +111,6 @@ const db = createDbProxy('E:\\info.mp-sq3')
 
 const info = {}
 
-// TODO: paths の中に db にあるものがないか、存在しないファイルがないかチェックする必要がある
-info.addMusics = async (paths) => {
-  const values = await Promise.all(
-    paths.map(async (path) => {
-      const [tags, lyric, length] = await Promise.all([
-        toAsyncCallback((c) => id3.read(path, c)),
-        readLyric(path),
-        toAsyncCallback((c) => mp3Duration(path, c)),
-      ])
-      return [
-        path,
-        Math.round(length * 1000),
-        tags.title ?? '',
-        tags.artist ?? '',
-        tags.album ?? '',
-        lyric ?? '',
-      ]
-    })
-  )
-  await db.run(
-    `INSERT OR IGNORE INTO musics (
-      path,
-      length,
-      title,
-      artist,
-      album,
-      lyric
-    ) VALUES ${repeatPlaceholder('(?, ?, ?, ?, ?, ?)', paths.length)}`,
-    ...values.flat()
-  )
-}
-
 info.settings = {}
 
 info.settings.set = async (obj) => {
@@ -163,7 +131,7 @@ info.settings.insert = async (obj) => {
     value.toString(),
   ])
   return await db.run(
-    `INSERT OR IGNORE INTO settings (
+    `INSERT INTO settings (
       key,
       value
     ) VALUES ${repeatPlaceholder('(?, ?)', values.length)}`,
@@ -186,7 +154,7 @@ info.settings.get = async () => {
   )
 }
 
-info.settings.setIfNeededAndGet = async (obj) => {
+info.settings.insertIfNeededAndGet = async (obj) => {
   const clonedObj = { ...obj }
   const settings = await info.settings.get()
   Object.entries(clonedObj).forEach(([key, value]) => {
@@ -202,33 +170,173 @@ info.settings.setIfNeededAndGet = async (obj) => {
   }
 }
 
-info.insertPlaylists = async (...values) => {
-  return await db.run(
-    `INSERT OR IGNORE INTO playlists (
-      name,
-      display_idx
-    ) VALUES ${repeatPlaceholder('(?, ?)', values.length)}`,
-    ...values.flat()
+info.musics = {}
+
+info.musics.getByIds = async (ids) => {
+  const musics = await db.all(
+    `SELECT * FROM musics WHERE id IN (${repeatPlaceholder('?', ids.length)})`,
+    ...ids
   )
+  const musicDict = {}
+  for (const music of musics) {
+    musicDict[music.id] = music
+  }
+  return ids.map((id) => musicDict[id])
 }
 
-info.getPlaylists = async () => {
+info.playlists = {}
+
+info.playlists.insert = async (names) => {
+  let count = await db.get(`SELECT COUNT(*) FROM playlists`)
+  count = Number.isNaN(count) ? 0 : count
+  const values = names.map((name) => [name, true, count++])
+  await db.run(
+    `INSERT INTO playlists (
+      name,
+      is_display,
+      display_idx
+    ) VALUES ${repeatPlaceholder('(?, ?, ?)', names.length)}`,
+    ...values.flat()
+  )
+  const playlists = await db.all(
+    `SELECT * FROM playlists WHERE name IN (${repeatPlaceholder(
+      '?',
+      names.length
+    )})`,
+    ...names
+  )
+  const playlistDict = {}
+  for (const playlist of playlists) {
+    playlistDict[playlist.name] = playlist
+  }
+
+  return values.map((value) => ({
+    id: playlistDict[value[0]].id,
+    name: value[0],
+    isDisplay: true,
+    displayIdx: value[1],
+    playingIdx: 0,
+    musics: [],
+  }))
+}
+
+info.playlists.getAll = async () => {
   return await Promise.all(
     (await db.all(`SELECT * FROM playlists`))
       .map(snakeKeyToCamel)
       .map(async (playlist) => {
         playlist.isDisplay = Boolean(playlist.isDisplay)
-        // const musicIds = await db.all(
-        //   `SELECT * FROM playlists_musics
-        //     WHERE playlist_id = ?
-        //     ORDER BY idx ASC`,
-        //   playlist.id
-        // )
-
-        // console.log(musicIds)
+        const musicIds = (
+          await db.all(
+            `SELECT id FROM playlists_musics
+            WHERE playlist_id = ?
+            ORDER BY idx ASC`,
+            playlist.id
+          )
+        ).map((row) => row.id)
+        playlist.musics = await info.musics.getByIds(musicIds)
         return playlist
       })
   )
+}
+
+info.playlists.insertMusic = async (playlistId, idx, paths) => {
+  const musics = await info.musics.insertIfNeededAndGet(paths)
+  await db.run(
+    `UPDATE playlists_musics SET idx = idx + ? WHERE idx <= ?`,
+    paths.length,
+    idx
+  )
+  const values = musics.map(({ id }) => [idx++, playlistId, id])
+  await db.run(
+    `INSERT INTO playlists_musics (
+    idx,
+    playlist_id,
+    music_id
+  ) VALUES ${repeatPlaceholder('(?, ?, ?)', paths.length)}`,
+    ...values.flat()
+  )
+  return musics
+}
+
+info.musics.insert = async (paths) => {
+  const values = await Promise.all(
+    paths.map(async (path) => {
+      const [tags, lyric, length] = await Promise.all([
+        toAsyncCallback((c) => id3.read(path, c)),
+        readLyric(path),
+        toAsyncCallback((c) => mp3Duration(path, c)),
+      ])
+      return [
+        path,
+        Math.round(length * 1000),
+        tags.title ?? '',
+        tags.artist ?? '',
+        tags.album ?? '',
+        lyric ?? '',
+      ]
+    })
+  )
+  await db.run(
+    `INSERT INTO musics (
+      path,
+      length,
+      title,
+      artist,
+      album,
+      lyric
+    ) VALUES ${repeatPlaceholder('(?, ?, ?, ?, ?, ?)', paths.length)}`,
+    ...values.flat()
+  )
+
+  const musics = await db.all(
+    `SELECT * FROM musics WHERE path IN (${repeatPlaceholder(
+      '?',
+      values.length
+    )})`,
+    ...values.map(([path]) => path)
+  )
+  const musicDict = {}
+  for (const music of musics) {
+    musicDict[music.path] = music
+  }
+  return values.map((value) => ({
+    id: musicDict[value[0]].id,
+    path: value[0],
+    length: value[1],
+    title: value[2],
+    artist: value[3],
+    album: value[4],
+    lyric: value[5],
+  }))
+}
+
+info.musics.insertIfNeededAndGet = async (paths) => {
+  const existsPaths = paths.filter(fs.existsSync)
+  const musics = await db.all(
+    `SELECT * FROM musics WHERE path IN (${repeatPlaceholder(
+      '?',
+      existsPaths.length
+    )})`,
+    ...existsPaths
+  )
+  const musicDict = {}
+  for (const music of musics) {
+    musicDict[music.path] = music
+  }
+  const pathAndMusics = existsPaths.map((p) => [p, musicDict[p]])
+  const unregisteredUniquePaths = [
+    ...new Set(
+      pathAndMusics.filter(([_, music]) => !music).map(([path]) => path)
+    ),
+  ]
+  if (unregisteredUniquePaths.length) {
+    const newMusics = await info.musics.insert(unregisteredUniquePaths)
+    for (const music of newMusics) {
+      musicDict[music.path] = music
+    }
+  }
+  return pathAndMusics.map(([p, music]) => music ?? musicDict[p])
 }
 
 module.exports = info

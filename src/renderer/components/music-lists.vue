@@ -33,7 +33,7 @@
     <music-list
       class="music-list"
       :key="currentListIndex"
-      :musics="currentList?.musics ?? []"
+      :list="lists[currentListIndex]"
       @insert-musics="(files) => $emit('insert-musics', currentList, files)"
       @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
@@ -66,10 +66,13 @@ export default {
     currentList() {
       return this.lists[this.currentListIndex]
     },
+    info() {
+      return this.$store.state.info
+    },
   },
   methods: {
     addList() {
-      this.$emit('update:lists', [...this.lists, { name: 'new', musics: [] }])
+      this.info.insertPlaylists(['new'])
     },
     moveList(delta) {
       this.$emit(

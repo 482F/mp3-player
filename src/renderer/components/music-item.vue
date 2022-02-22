@@ -9,7 +9,7 @@
       <div class="playing-icon">
         <v-icon v-show="music.isPlaying">mdi-play</v-icon>
       </div>
-      <div>{{ music.name }}</div>
+      <div>{{ music.title }}</div>
       <div class="rating">
         <v-icon
           v-for="i of 5"
