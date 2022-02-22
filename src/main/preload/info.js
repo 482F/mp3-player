@@ -259,6 +259,11 @@ info.playlists.insertMusic = async (playlistId, idx, paths) => {
   return musics
 }
 
+info.playlists.updateName = async (playlistId, newName) => {
+  console.log(playlistId, newName)
+  await db.run(`UPDATE playlists SET name = ? WHERE id = ?`, newName, playlistId)
+}
+
 info.musics.insert = async (paths) => {
   const values = await Promise.all(
     paths.map(async (path) => {
