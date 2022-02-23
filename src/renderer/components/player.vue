@@ -33,7 +33,6 @@
           />
         </div>
         <div class="right">
-          <v-icon @click="$emit('export')">mdi-content-save</v-icon>
           <v-icon
             @click="$emit('update:loop', !loop)"
             :color="loop ? 'black' : '#ccc'"
