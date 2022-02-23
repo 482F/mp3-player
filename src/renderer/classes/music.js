@@ -16,13 +16,13 @@ export default class Playlist {
   }
 
   async open(gain = 1) {
+    this._gain = gain
     this.file = await readFile(this.path)
     const buffer = this.file.buffer
     this._audioCtx = new AudioContext()
     this._audioBuffer = await new Promise((resolve) =>
       this._audioCtx.decodeAudioData(buffer, resolve)
     )
-    this._gain = gain
     this._createSource()
   }
 
