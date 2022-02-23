@@ -360,6 +360,50 @@ info.playlists.removeMusic = async (playlistId, idx) => {
   )
 }
 
+// TODO: N+1
+info.playlists.moveMusics = async (playlistId, oldIndice, newIndice) => {
+  if (oldIndice.length !== newIndice.length) {
+    throw new Error('oldIndice.length !== newIndice.length')
+  }
+  const indicePairs = []
+  for (let i = 0; i < oldIndice.length; i++) {
+    indicePairs.push([oldIndice[i], -newIndice[i]])
+  }
+  const toZeroIndice = indicePairs.find(([, newIdx]) => newIdx === 0)
+  const filteredIndicePairs = indicePairs.filter(([, newIdx]) => newIdx !== 0)
+  const filteredOldIndice = oldIndice.filter(
+    (oldIdx) => oldIdx !== toZeroIndice[0]
+  )
+  const length = filteredIndicePairs.length
+  // SET idx = 0 だけは unique 制約に違反する可能性があるため後で処理する
+  await db.run(
+    `UPDATE playlists_musics SET idx =
+      CASE idx
+        ${repeatPlaceholder('WHEN ? THEN ?', length, ' ')}
+      END
+      WHERE playlist_id = ?
+        AND idx IN (${repeatPlaceholder('?', length)})`,
+    ...filteredIndicePairs.flat(),
+    playlistId,
+    ...filteredOldIndice
+  )
+  if (toZeroIndice) {
+    await db.run(
+      `UPDATE playlists_musics SET idx = 0
+      WHERE playlist_id = ?
+        AND idx = ?`,
+      playlistId,
+      toZeroIndice[0]
+    )
+  }
+  await db.run(
+    `UPDATE playlists_musics SET idx = -1 * idx
+      WHERE playlist_id = ?
+        AND idx < 0`,
+    playlistId
+  )
+}
+
 // TODO: 単一の項目に関してのみ呼び出しができるため N+1 になりうる
 info.playlists.moveMusic = async (playlistId, oldIdx, newIdx) => {
   if (oldIdx === newIdx) {
