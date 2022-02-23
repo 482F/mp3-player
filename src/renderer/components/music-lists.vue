@@ -29,6 +29,7 @@
     </div>
     <music-list
       class="music-list"
+      :key="currentListIndex"
       :musics="currentList?.musics ?? []"
       @insert-musics="(files) => $emit('insert-musics', currentList, files)"
       @open="(music, index) => $emit('open', music, currentList, index)"
