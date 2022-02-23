@@ -6,6 +6,7 @@
       @update:volume="updateVolume"
       @skip="skip"
       @shuffle="shuffle"
+      @export="info.export()"
     />
     <music-lists
       ref="musicLists"
@@ -14,7 +15,6 @@
       @update:lists="updateLists"
       @insert-musics="insertMusics"
       @open="open"
-      @export="info.export()"
     />
   </div>
 </template>
@@ -63,7 +63,6 @@ export default {
       this.current.index = this.$refs.musicLists.currentList.musics.findIndex(
         (music) => music.isPlaying
       )
-      this.info.export()
     },
     async skip(delta) {
       const nextIndex =
@@ -90,11 +89,9 @@ export default {
           allPaths.map((path) => this.info.getMusicInfo(path))
         ))
       )
-      this.info.export()
     },
     updateLists(lists) {
       this.info.lists = lists
-      this.info.export()
     },
     updateVolume(volume) {
       this.current.music.gain = this.volume = volume
