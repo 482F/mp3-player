@@ -44,7 +44,7 @@ export default {
       const lines = this.rawLyricData.split('\n')
       const lineHeight = scrollHeight / lines.length
       const targetHeight = lineHeight * (lineIndex + 1)
-      const delta = targetHeight - (clientHeight / 2)
+      const delta = targetHeight - clientHeight / 2
       this.$refs.textarea.scrollTo(0, delta)
     },
     getSelectedLineIndex() {
@@ -88,6 +88,14 @@ export default {
         } else if (e.code === 'KeyS') {
           this.$emit('save')
         }
+      } else if (e.altKey) {
+        if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+          const index = this.getSelectedLineIndex()
+          const delta = { ArrowLeft: -1, ArrowRight: 1 }[e.code]
+          this.setColumn(index, delta)
+          await this.$nextTick()
+          this.setSelectedLineIndex(index)
+        }
       }
     },
     onInput(e) {
@@ -96,6 +104,18 @@ export default {
     insertNewline(lineIndex) {
       const lines = this.rawLyricData.split('\n')
       lines.splice(lineIndex + 1, 0, '')
+      this.rawLyricData = lines.join('\n')
+    },
+    setColumn(lineIndex, delta) {
+      const lines = this.rawLyricData.split('\n')
+      const newColumn = Math.max(
+        Number(lines[lineIndex].match(/^.*?\((\d+)\)/)?.[1] ?? 0) + delta,
+        0
+      )
+      lines[lineIndex] = lines[lineIndex].replace(
+        /^(\[.+?\])?(\(\d+\))?(\{\d+\})?/,
+        `$1(${newColumn})$3`
+      )
       this.rawLyricData = lines.join('\n')
     },
     setTime(lineIndex, time = null) {
