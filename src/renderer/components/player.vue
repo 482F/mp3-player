@@ -11,6 +11,9 @@
     <div class="control">
       <div class="center">
         <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
+        <v-icon @click="stop" size="x-large">
+          mdi-stop
+        </v-icon>
         <v-icon v-show="!music?.isPlaying" @click="start" size="x-large">
           mdi-play
         </v-icon>
@@ -81,6 +84,10 @@ export default {
   },
   mounted() {},
   methods: {
+    stop() {
+      this.info.current.music.stop()
+      this.info.current.music = null
+    },
     async start() {
       if (this.music) {
         this.music.start()
