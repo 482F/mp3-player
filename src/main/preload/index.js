@@ -1,8 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron')
-const fs = require('fs')
 const path = require('path')
 const JSON5 = require('json5')
 const info = require('./info.js')
+const fs = require('./fs.js')
 
 window.addEventListener('DOMContentLoaded', () => {
   //
@@ -31,68 +31,16 @@ const listenIpc = async (listenerName, eventName, handler) => {
   await sendIpc('main', 'listen', listenerName, eventName)
 }
 
-const readFile = async (filePath, encoding) =>
-  new Promise((resolve, reject) =>
-    fs.readFile(filePath, encoding, (err, data) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(data)
-      }
-    })
-  )
-
-const writeFile = async (filePath, data, options) =>
-  new Promise((resolve, reject) =>
-    fs.writeFile(filePath, data, options, (err, data) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(data)
-      }
-    })
-  )
-
-const readdir = (path) =>
-  new Promise((resolve, reject) =>
-    fs.readdir(path, (err, files) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(files)
-      }
-    })
-  )
-
-const stat = (path) =>
-  new Promise((resolve, reject) =>
-    fs.stat(path, (err, stats) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(stats)
-      }
-    })
-  )
-
-/*
-全部のファイルを読む必要は無い
-- でも D&D されたディレクトリ以下のファイルは全部読めるようにしておくべき
-D&D なりコマンドラインなりで渡されたファイルをアクティブなプレイリストに追加する
-info.json5 で保持するのはプレイリストと追加された曲のメタデータ (評価、歌詞、etc...)
-info.json5 に紐づけてプログラムが起動するようにしたいので info.mp5 とかにする？
-*/
-
 const extPattern = /\.([^.]+)$/
 
 const getAllPaths = async (targetPaths, filterExts = null) => {
   const paths = []
   for (const targetPath of targetPaths) {
-    if (await stat(targetPath).then((stats) => stats.isDirectory())) {
-      const children = await readdir(targetPath)
+    if (await fs.stat(targetPath).then((stats) => stats.isDirectory())) {
+      const children = await fs.readdir(targetPath)
       for (const child of children) {
         const absPath = path.join(targetPath, child)
-        if (await stat(absPath).then((stats) => stats.isDirectory())) {
+        if (await fs.stat(absPath).then((stats) => stats.isDirectory())) {
           paths.push(...(await getAllPaths(absPath, filterExts)))
         } else {
           if (!filterExts || filterExts.includes(child.match(extPattern)[1])) {
@@ -123,7 +71,7 @@ const getAllMusicPaths = async (targetPaths) => {
   )
   await Promise.all(
     playlistPaths.map(async (playlistPath) => {
-      const playlist = (await readFile(playlistPath, 'utf-8'))
+      const playlist = (await fs.readFile(playlistPath, 'utf-8'))
         .replaceAll('\r', '')
         .split('\n')
         .filter((line) => !['#', undefined].includes(line[0]))
@@ -136,7 +84,7 @@ const getAllMusicPaths = async (targetPaths) => {
 const readLyric = async (musicPath) => {
   const lrcPath = musicPath.replace(extPattern, '.lrc')
   try {
-    return await readFile(lrcPath, 'utf-8')
+    return await fs.readFile(lrcPath, 'utf-8')
   } catch {
     return ''
   }
@@ -145,7 +93,7 @@ const readLyric = async (musicPath) => {
 const writeLyric = async (musicPath, lyric) => {
   const lrcPath = musicPath.replace(extPattern, '.lrc')
   try {
-    return await writeFile(lrcPath, lyric)
+    return await fs.writeFile(lrcPath, lyric)
   } catch {
     return ''
   }
@@ -154,7 +102,7 @@ const writeLyric = async (musicPath, lyric) => {
 const infoFunctions = {
   async export(infoPath, info) {
     const json = JSON5.stringify(info, null, '  ')
-    await writeFile(infoPath, json)
+    await fs.writeFile(infoPath, json)
   },
 }
 
@@ -162,7 +110,7 @@ const passObject = {
   requires: {
     listenIpc,
     sendIpc,
-    readFile,
+    readFile: fs.readFile,
     getAllMusicPaths,
     readLyric,
     writeLyric,
