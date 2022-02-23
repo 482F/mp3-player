@@ -110,6 +110,12 @@ export default {
           column: column.column,
           color: 'black',
         })
+        column.push({
+          time: this.music.length * 1000,
+          text: '',
+          column: column.column,
+          color: 'black',
+        })
         const diffs = []
         for (let i = 0; i < column.length - 1; i++) {
           if (column[i].text === '') {
@@ -120,7 +126,8 @@ export default {
           const diff = end - start
           diffs.push(diff)
         }
-        const maxDiff = diffs.reduce((sum, num) => sum += num, 0) / diffs.length
+        const maxDiff =
+          diffs.reduce((sum, num) => (sum += num), 0) / diffs.length
         for (let i = 0; i < column.length - 1; i++) {
           const start = column[i].time
           const end = column[i + 1].time
