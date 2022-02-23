@@ -91,6 +91,7 @@ export default {
       flex-grow: 1;
       margin-top: calc(-1 * var(--offset));
       > .line {
+        min-height: var(--line-height);
         position: relative;
         &:not(.current) {
           > .mask {
