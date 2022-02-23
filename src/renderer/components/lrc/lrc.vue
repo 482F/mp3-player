@@ -1,14 +1,16 @@
 <template>
   <div class="lrc">
     <div class="control">
-      <v-icon v-if="!editing" @click="editing = true"> mdi-pencil </v-icon>
+      <v-icon v-if="!editing" @click="$emit('update:editing', true)">
+        mdi-pencil
+      </v-icon>
       <template v-else>
         <v-icon @click="cancel"> mdi-close </v-icon>
         <v-icon
           @click="
             () => {
               save()
-              editing = false
+              $emit('update:editing', false)
             }
           "
         >
@@ -41,7 +43,6 @@ export default {
   },
   data() {
     return {
-      editing: false,
       initRawLyric: '',
       rawLyric: '',
       lyricData: null,
@@ -52,6 +53,10 @@ export default {
     music: {
       type: Object,
       default: null,
+    },
+    editing: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -97,7 +102,7 @@ export default {
     },
     cancel() {
       this.rawLyric = this.initRawLyric
-      this.editing = false
+      this.$emit('update:editing', false)
     },
     async save() {
       this.initRawLyric = this.rawLyric
