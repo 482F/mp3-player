@@ -59,40 +59,88 @@ export default {
   },
   computed: {
     lyricData() {
+      const colorDict = {}
+      for (const colorData of [...this.rawLyric.matchAll(/\{(\d+):(.+?)\}/g)]) {
+        colorDict[colorData[1]] = colorData[2]
+      }
       const data = this.rawLyric
         .split('\n')
         .map((line) => {
-          const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/)
+          const match = line.match(
+            /^\[(\d+):(\d+)\.(\d+)\](\((\d+)\))?(\{(\d+)\})?(.*)/
+          )
           if (!match) {
             return null
           }
+          const [
+            ,
+            minutes,
+            seconds,
+            milliseconds,
+            ,
+            column = '0',
+            ,
+            colorIndex,
+            text,
+          ] = match
           const time =
-            ((Number(match[1]) * 60 + Number(match[2])) * 100 +
-              Number(match[3])) *
+            ((Number(minutes) * 60 + Number(seconds)) * 100 +
+              Number(milliseconds)) *
             10
-          const text = match[4]
           return {
             time,
             text,
+            column,
+            color: colorDict[colorIndex] ?? colorDict[column] ?? 'black',
           }
         })
         .filter(Boolean)
-      const maxDiff = 3000
-      for (let i = 0; i < data.length - 1; i++) {
-        const start = data[i].time
-        const end = data[i + 1].time
-        const diff = end - start
-        if (data[i].text === '' && maxDiff <= diff) {
-          const numberOfPadding = Math.floor(diff / maxDiff)
-          const times = Array(numberOfPadding)
-            .fill(0)
-            .map((_, i) => (diff * (i + 1)) / (numberOfPadding + 1) + start)
-            .map(Math.round)
-          data.splice(i + 1, 0, ...times.map((time) => ({ time, text: '' })))
-          i += numberOfPadding
+      const columnDict = {}
+      for (const datum of data) {
+        columnDict[datum.column] ??= []
+        columnDict[datum.column].push(datum)
+      }
+
+      const splittedData = Object.values(columnDict)
+
+      for (const column of splittedData) {
+        column.unshift({
+          time: 0,
+          text: '',
+          column: column.column,
+          color: 'black',
+        })
+        const diffs = []
+        for (let i = 0; i < column.length - 1; i++) {
+          if (column[i].text === '') {
+            continue
+          }
+          const start = column[i].time
+          const end = column[i + 1].time
+          const diff = end - start
+          diffs.push(diff)
+        }
+        const maxDiff = diffs.reduce((sum, num) => sum += num, 0) / diffs.length
+        for (let i = 0; i < column.length - 1; i++) {
+          const start = column[i].time
+          const end = column[i + 1].time
+          const diff = end - start
+          if (column[i].text === '' && maxDiff <= diff) {
+            const numberOfPadding = Math.floor(diff / maxDiff)
+            const times = Array(numberOfPadding)
+              .fill(0)
+              .map((_, i) => (diff * (i + 1)) / (numberOfPadding + 1) + start)
+              .map(Math.round)
+            column.splice(
+              i + 1,
+              0,
+              ...times.map((time) => ({ time, text: '' }))
+            )
+            i += numberOfPadding
+          }
         }
       }
-      return data
+      return splittedData
     },
   },
   watch: {
