@@ -37,11 +37,11 @@ function createDbProxy(dbFilePath) {
   })
 }
 
-function repeatPlaceholder(placeholder, length) {
+function repeatPlaceholder(placeholder, length, joint = ',') {
   return Array(length)
     .fill(0)
     .map(() => placeholder)
-    .join(',')
+    .join(joint)
 }
 
 const readLyric = async (musicPath) => {
