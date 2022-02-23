@@ -146,6 +146,7 @@ info.settings.get = async () => {
           volume: Number,
           currentListIndex: Number,
           loop: (v) => v === 'true',
+          leftWidth: Number,
         }
         return { [key]: (converters[key] ?? ((v) => v))(value) }
       })

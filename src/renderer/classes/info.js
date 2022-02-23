@@ -12,6 +12,7 @@ export default class Info {
       volume: 1,
       currentListIndex: 0,
       loop: false,
+      leftWidth: 600,
     }
     const settings = await info.settings.insertIfNeededAndGet(defaultSettings)
     Object.entries(settings).forEach(([key, value]) => {
@@ -55,6 +56,14 @@ export default class Info {
   set currentListIndex(value) {
     this._currentListIndex = value
     this.saveCurrentListIndex(value)
+  }
+
+  get leftWidth() {
+    return this._leftWidth
+  }
+  set leftWidth(value) {
+    this._leftWidth = value
+    this.saveLeftWidth(value)
   }
 
   get playlists() {
