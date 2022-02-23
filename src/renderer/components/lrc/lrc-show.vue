@@ -87,8 +87,9 @@ export default {
   }
   > .body {
     display: flex;
+    gap: 8px;
     > .column {
-      flex-grow: 1;
+      width: 100%;
       margin-top: calc(-1 * var(--offset));
       > .line {
         min-height: var(--line-height);
