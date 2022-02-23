@@ -128,7 +128,7 @@ export default {
       if (this.info.current.music !== music) {
         return
       }
-      this.info.current.music.start()
+      this.info.current.music.start(0)
       this.info.current.music.onended = () => this.onended()
     },
     async onended() {
