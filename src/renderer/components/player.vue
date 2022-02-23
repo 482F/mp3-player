@@ -1,9 +1,11 @@
 <template>
   <div class="f-player">
-    <div class="info" v-if="music">
-      <div class="name">{{ music.name }}</div>
-      <div>
-        {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
+    <div class="info">
+      <div v-if="music">
+        <div class="name">{{ music.title }}</div>
+        <div>
+          {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
+        </div>
       </div>
     </div>
     <div class="control">
@@ -102,7 +104,7 @@ export default {
   align-items: center;
   .info {
     height: 64px;
-    > .name {
+    .name {
       font-size: 24px;
     }
     > * {
