@@ -4,6 +4,7 @@
     <div class="body">
       <div
         class="column"
+        ref="columns"
         v-for="(column, i) of lyricData"
         :key="i"
         :style="{ '--offset': offsets[i] + 'px' }"
@@ -16,6 +17,7 @@
           :style="{ color }"
         >
           {{ line }}
+          <div class="mask" />
         </div>
       </div>
     </div>
@@ -55,14 +57,20 @@ export default {
     offsets() {
       return this.lyricData.map((column, i) => {
         const currentIndex = this.currentIndice[i]
-        if (currentIndex === -1) {
+        if (currentIndex === -1 || !this.$refs.columns?.[i]) {
           return 0
         }
         const partStart = column[currentIndex].time
         const partEnd = column[currentIndex + 1]?.time ?? Infinity
         const decimalPart =
           (this.currentTime - partStart) / (partEnd - partStart)
-        return Math.round((currentIndex + decimalPart) * lineHeight)
+        const lines = [...this.$refs.columns[i].children]
+        const pastLinesHeight = lines
+          .slice(0, currentIndex)
+          .map((line) => line.clientHeight)
+          .reduce((sum, num) => (sum += num), 0)
+        const processingLineOffset = lines[currentIndex].clientHeight
+        return pastLinesHeight + Math.round(processingLineOffset * decimalPart)
       })
     },
   },
@@ -82,15 +90,14 @@ export default {
     > .column {
       flex-grow: 1;
       margin-top: calc(-1 * var(--offset));
-      position: relative;
       > .line {
-        height: var(--line-height);
+        position: relative;
         &:not(.current) {
-          &::after {
-            content: '';
+          > .mask {
             width: 100%;
-            height: var(--line-height);
+            height: 100%;
             position: absolute;
+            top: 0;
             left: 0;
             background-color: #ffffff77;
           }
