@@ -31,7 +31,6 @@ const listenIpc = async (listenerName, eventName, handler) => {
   await sendIpc('main', 'listen', listenerName, eventName)
 }
 
-const extPattern = /\.([^.]+)$/
 
 const getAllPaths = async (targetPaths, filterExts = null) => {
   const paths = []
@@ -43,7 +42,7 @@ const getAllPaths = async (targetPaths, filterExts = null) => {
         if (await fs.stat(absPath).then((stats) => stats.isDirectory())) {
           paths.push(...(await getAllPaths(absPath, filterExts)))
         } else {
-          if (!filterExts || filterExts.includes(child.match(extPattern)[1])) {
+          if (!filterExts || filterExts.includes(child.match(fs.extPattern)[1])) {
             paths.push(absPath)
           }
         }
@@ -59,7 +58,7 @@ const getAllMusicPaths = async (targetPaths) => {
   const paths = await getAllPaths(targetPaths, ['mp3', 'm3u8'])
   const { music: musicPaths, playlist: playlistPaths } = paths.reduce(
     (all, path) => {
-      const ext = path.match(extPattern)[1]
+      const ext = path.match(fs.extPattern)[1]
       if (['mp3'].includes(ext)) {
         all.music.push(path)
       } else if (['m3u8'].includes(ext)) {
