@@ -1,5 +1,5 @@
 <template>
-  <div class="f-main">
+  <div class="f-main" tabindex="0" @keydown="onKeydown">
     <player
       :music="current.music"
       :volume="info.volume ?? 1"
@@ -62,6 +62,25 @@ export default {
     await this.initInfo()
   },
   methods: {
+    onKeydown(e) {
+      if (e.ctrlKey) {
+        if (e.code === 'ArrowRight') {
+          this.shiftMusicTime(3)
+          e.preventDefault()
+        } else if (e.code === 'ArrowLeft') {
+          this.shiftMusicTime(-3)
+          e.preventDefault()
+        }
+      }
+    },
+    shiftMusicTime(delta) {
+      if (this.current.music) {
+        this.current.music.currentTime = Math.max(
+          this.current.music.currentTime + delta,
+          0
+        )
+      }
+    },
     deleteItem({ musics }, i) {
       musics.splice(i, 1)
     },
@@ -143,8 +162,9 @@ export default {
       flex-shrink: 0;
     }
     .lrc {
+      min-height: 0;
       flex-grow: 1;
-      margin: 0 16px;
+      margin: 0 16px 16px;
     }
     display: flex;
   }
