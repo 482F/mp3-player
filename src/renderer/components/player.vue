@@ -1,9 +1,9 @@
 <template>
   <div class="f-player">
-    <div class="info">
-      <div v-if="music">
-        {{ music.name }} {{ formatTime(music.currentTime) }} /
-        {{ formatTime(music.length) }}
+    <div class="info" v-if="music">
+      <div class="name">{{ music.name }}</div>
+      <div>
+        {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
       </div>
     </div>
     <div class="control">
@@ -83,12 +83,17 @@ export default {
 
 <style lang="scss" scoped>
 .f-player {
-  height: 128px;
   display: flex;
   flex-direction: column;
   align-items: center;
   .info {
     height: 64px;
+    > .name {
+      font-size: 24px;
+    }
+    > * {
+      text-align: center;
+    }
   }
   .slider {
     --height: 6px;
