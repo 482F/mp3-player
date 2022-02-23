@@ -40,8 +40,7 @@ export default {
     },
   },
   data() {
-    return {
-    }
+    return {}
   },
   computed: {
     info() {
@@ -50,7 +49,10 @@ export default {
   },
   methods: {
     insertMusics(files) {
-      this.list.insertMusics(0, files.map((file) => file.path))
+      this.list.insertMusics(
+        0,
+        files.map((file) => file.path)
+      )
     },
   },
 }

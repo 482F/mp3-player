@@ -9,14 +9,14 @@ export default class Playlist {
     this._isDisplay = isDisplay
     this._displayIndex = displayIdx
     this._playingIndex = playingIdx
-    this._musics = musics.map((music) => music ? new Music(this, music) : {})
+    this._musics = musics.map((music, i) => music ? new Music(this, i, music) : {})
   }
 
   async insertMusics(index, paths) {
     const musics = await info.playlists.insertMusic(this.id, index, paths)
     this._musics.push(
-      ...(musics).map(
-        (music) => new Music(this, music)
+      ...(musics, i).map(
+        (music) => new Music(this, this._musics.length + i, music)
       )
     )
   }

@@ -3,7 +3,7 @@ const info = window.info
 const path = window.path
 
 export default class Playlist {
-  constructor(list, { id, path, length, title, artist, album, lyric }) {
+  constructor(list, index, { id, path, length, title, artist, album, lyric }) {
     this.list = list
     this._id = id
     this._path = path
