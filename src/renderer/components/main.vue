@@ -12,6 +12,7 @@
       ref="musicLists"
       class="music-lists"
       :lists="info.lists"
+      v-model:current-list-index="info.currentListIndex"
       @update:lists="updateLists"
       @insert-musics="insertMusics"
       @open="open"

@@ -8,7 +8,7 @@
         :rounded="0"
         v-for="(list, i) of lists"
         :key="i"
-        @mousedown="currentListIndex = i"
+        @mousedown="$emit('update:current-list-index', i)"
         @dblclick="renameList(list, i)"
         @click.middle="lists.splice(i, 1)"
       >
@@ -46,14 +46,16 @@ export default {
     MusicList,
   },
   data() {
-    return {
-      currentListIndex: 0,
-    }
+    return {}
   },
   props: {
     lists: {
       type: Array,
       default: () => [],
+    },
+    currentListIndex: {
+      type: Number,
+      default: 0,
     },
   },
   computed: {
@@ -66,8 +68,11 @@ export default {
       this.$emit('update:lists', [...this.lists, { name: 'new', musics: [] }])
     },
     moveList(delta) {
-      this.currentListIndex =
-        (this.currentListIndex + delta + this.lists.length) % this.lists.length
+      this.$emit(
+        'update:current-list-index'(
+          this.currentListIndex + delta + this.lists.length
+        ) % this.lists.length
+      )
       this.$refs.list[this.currentListIndex].$el.scrollIntoView({
         behavior: 'smooth',
       })
