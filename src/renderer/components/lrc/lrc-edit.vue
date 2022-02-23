@@ -39,6 +39,14 @@ export default {
     this.rawLyricData = this.rawLyric
   },
   methods: {
+    scrollToLine(lineIndex) {
+      const { clientHeight, scrollHeight } = this.$refs.textarea
+      const lines = this.rawLyricData.split('\n')
+      const lineHeight = scrollHeight / lines.length
+      const targetHeight = lineHeight * (lineIndex + 1)
+      const delta = targetHeight - (clientHeight / 2)
+      this.$refs.textarea.scrollTo(0, delta)
+    },
     getSelectedLineIndex() {
       const selectionStart = this.$refs.textarea.selectionStart
       let lengthSum = 0
@@ -59,6 +67,7 @@ export default {
         .join('').length
       this.$refs.textarea.selectionStart = lengthSum
       this.$refs.textarea.selectionEnd = lengthSum
+      this.scrollToLine(lineIndex)
     },
     async onKeydown(e) {
       if (e.ctrlKey) {
