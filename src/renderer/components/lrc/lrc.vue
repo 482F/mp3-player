@@ -54,7 +54,7 @@ export default {
             return null
           }
           const time =
-            (Number(match[1]) * 60 + Number(match[2])) * 1000 + Number(match[3])
+            ((Number(match[1]) * 60 + Number(match[2])) * 100 + Number(match[3])) * 10
           const text = match[4]
           return {
             time,
