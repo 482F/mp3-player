@@ -81,7 +81,7 @@ export default {
     },
     async insertMusics(targetList, droppedFiles) {
       console.log({ targetList, droppedFiles })
-      const allPaths = await this.$getAllPaths(
+      const allPaths = await this.$getAllMusicPaths(
         droppedFiles.map((file) => file.path),
         ['mp3']
       )

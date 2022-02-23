@@ -82,6 +82,8 @@ info.json5 で保持するのはプレイリストと追加された曲のメタ
 info.json5 に紐づけてプログラムが起動するようにしたいので info.mp5 とかにする？
 */
 
+const extPattern = /\.([^.]+)$/
+
 const getAllPaths = async (targetPaths, filterExts = null) => {
   const paths = []
   for (const targetPath of targetPaths) {
@@ -92,10 +94,7 @@ const getAllPaths = async (targetPaths, filterExts = null) => {
         if (await stat(absPath).then((stats) => stats.isDirectory())) {
           paths.push(...(await getAllPaths(absPath, filterExts)))
         } else {
-          if (
-            !filterExts ||
-            filterExts.includes(child.match(/\.([^.]+)$/)[1])
-          ) {
+          if (!filterExts || filterExts.includes(child.match(extPattern)[1])) {
             paths.push(absPath)
           }
         }
@@ -105,6 +104,32 @@ const getAllPaths = async (targetPaths, filterExts = null) => {
     }
   }
   return paths
+}
+
+const getAllMusicPaths = async (targetPaths) => {
+  const paths = await getAllPaths(targetPaths, ['mp3', 'm3u8'])
+  const { music: musicPaths, playlist: playlistPaths } = paths.reduce(
+    (all, path) => {
+      const ext = path.match(extPattern)[1]
+      if (['mp3'].includes(ext)) {
+        all.music.push(path)
+      } else if (['m3u8'].includes(ext)) {
+        all.playlist.push(path)
+      }
+      return all
+    },
+    { music: [], playlist: [] }
+  )
+  await Promise.all(
+    playlistPaths.map(async (playlistPath) => {
+      const playlist = (await readFile(playlistPath, 'utf-8'))
+        .replaceAll('\r', '')
+        .split('\n')
+        .filter((line) => !['#', undefined].includes(line[0]))
+      musicPaths.push(...playlist)
+    })
+  )
+  return musicPaths
 }
 
 const infoFunctions = {
@@ -119,7 +144,7 @@ const passObject = {
     listenIpc,
     sendIpc,
     readFile,
-    getAllPaths,
+    getAllMusicPaths,
   },
   infoFunctions,
   JSON5,
