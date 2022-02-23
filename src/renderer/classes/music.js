@@ -22,8 +22,8 @@ export default class Playlist {
     this._audioBuffer = await new Promise((resolve) =>
       this._audioCtx.decodeAudioData(buffer, resolve)
     )
+    this._gain = gain
     this._createSource()
-    this.gain = gain
   }
 
   stop() {
@@ -36,6 +36,7 @@ export default class Playlist {
     this._source.buffer = this._audioBuffer
     this._gainNode = this._audioCtx.createGain()
     this._source.connect(this._gainNode)
+    this.gain = this._gain
     this._gainNode.connect(this._audioCtx.destination)
   }
 
@@ -48,10 +49,13 @@ export default class Playlist {
   }
 
   get gain() {
-    return this._gainNode.gain.value
+    return this._gain
   }
   set gain(value) {
-    this._gainNode.gain.value = value
+    this._gain = value
+    if (this._gainNode) {
+      this._gainNode.gain.value = value
+    }
   }
 
   get currentTime() {
