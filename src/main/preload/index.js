@@ -80,24 +80,6 @@ const getAllMusicPaths = async (targetPaths) => {
   return musicPaths
 }
 
-const readLyric = async (musicPath) => {
-  const lrcPath = musicPath.replace(extPattern, '.lrc')
-  try {
-    return await fs.readFile(lrcPath, 'utf-8')
-  } catch {
-    return ''
-  }
-}
-
-const writeLyric = async (musicPath, lyric) => {
-  const lrcPath = musicPath.replace(extPattern, '.lrc')
-  try {
-    return await fs.writeFile(lrcPath, lyric)
-  } catch {
-    return ''
-  }
-}
-
 const infoFunctions = {
   async export(infoPath, info) {
     const json = JSON5.stringify(info, null, '  ')
@@ -111,8 +93,6 @@ const passObject = {
     sendIpc,
     readFile: fs.readFile,
     getAllMusicPaths,
-    readLyric,
-    writeLyric,
   },
   infoFunctions,
   JSON5,

@@ -1,29 +1,58 @@
+const id3 = require('node-id3')
+const mp3Duration = require('mp3-duration')
+const fs = require('./fs.js')
+
+function toAsyncCallback(func) {
+  return new Promise((resolve, reject) => {
+    func((err, result) => {
+      if (err) reject(err)
+      resolve(result)
+    })
+  })
+}
+
+function createDbProxy(dbFilePath) {
+  const sqlite3 = require('sqlite3')
+  return new Proxy(new sqlite3.Database(dbFilePath), {
+    get: function (db, key, receiver) {
+      if (['run', 'get', 'all'].includes(key)) {
+        return async (sql, ...params) =>
+          await toAsyncCallback((c) => db[key](sql, ...params, c))
+      } else {
+        return (...args) => db[key](...args)
+      }
+    },
+  })
+}
+
+function repeatPlaceholder(placeholder, length) {
+  return Array(length)
+    .fill(0)
+    .map(() => placeholder)
+    .join(',')
+}
+
+const readLyric = async (musicPath) => {
+  const lrcPath = musicPath.replace(fs.extPattern, '.lrc')
+  try {
+    return await fs.readFile(lrcPath, 'utf-8')
+  } catch {
+    return ''
+  }
+}
+
+const writeLyric = async (musicPath, lyric) => {
+  const lrcPath = musicPath.replace(fs.extPattern, '.lrc')
+  try {
+    return await fs.writeFile(lrcPath, lyric)
+  } catch {
+    return ''
+  }
+}
+
+const db = createDbProxy('E:\\info.mp-sq3')
+
 ;(async function () {
-  function toAsyncCallback(func) {
-    return new Promise((resolve, reject) => {
-      func((err, result) => {
-        if (err) reject(err)
-        resolve(result)
-      })
-    })
-  }
-
-  function createDbProxy(dbFilePath) {
-    const sqlite3 = require('sqlite3')
-    return new Proxy(new sqlite3.Database(dbFilePath), {
-      get: function (db, key, receiver) {
-        if (['run', 'get', 'all'].includes(key)) {
-          return async (sql, ...params) =>
-            await toAsyncCallback((c) => db[key](sql, ...params, c))
-        } else {
-          return (...args) => db[key](...args)
-        }
-      },
-    })
-  }
-
-  const db = createDbProxy('E:\\info.mp-sq3')
-
   await db.run(`
   CREATE TABLE IF NOT EXISTS settings (
     id INTEGER UNIQUE NOT NULL PRIMARY KEY,
@@ -66,8 +95,40 @@
     music_id INTEGER        NOT NULL            ,
     FOREIGN KEY(music_id) REFERENCES musics(id)
   );`)
-
-  const info = {}
-
-  module.exports = { info }
 })()
+
+const info = {}
+
+// TODO: paths の中に db にあるものがないか、存在しないファイルがないかチェックする必要がある
+info.addMusics = async (paths) => {
+  const values = await Promise.all(
+    paths.map(async (path) => {
+      const [tags, lyric, length] = await Promise.all([
+        toAsyncCallback((c) => id3.read(path, c)),
+        readLyric(path),
+        toAsyncCallback((c) => mp3Duration(path, c)),
+      ])
+      return [
+        path,
+        Math.round(length * 1000),
+        tags.title ?? '',
+        tags.artist ?? '',
+        tags.album ?? '',
+        lyric ?? '',
+      ]
+    })
+  )
+  await db.run(
+    `INSERT OR IGNORE INTO musics (
+      path,
+      length,
+      title,
+      artist,
+      album,
+      lyric
+    ) VALUES ${repeatPlaceholder('(?, ?, ?, ?, ?, ?)', paths.length)}`,
+    ...values.flat()
+  )
+}
+
+module.exports = info
