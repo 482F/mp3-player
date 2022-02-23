@@ -10,6 +10,7 @@ export default class CustomAudio {
     return audio
   }
   async init(filePath, gain = 1) {
+    this.filePath = filePath
     this.name = path.basename(filePath).replace(/\.[^.]+/, '')
     this.file = await readFile(filePath)
     const buffer = this.file.buffer

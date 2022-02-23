@@ -8,15 +8,18 @@
       @shuffle="shuffle"
       @export="info.export()"
     />
-    <music-lists
-      ref="musicLists"
-      class="music-lists"
-      :lists="info.lists"
-      v-model:current-list-index="info.currentListIndex"
-      @update:lists="updateLists"
-      @insert-musics="insertMusics"
-      @open="open"
-    />
+    <div class="content">
+      <music-lists
+        ref="musicLists"
+        class="music-lists"
+        :lists="info.lists"
+        v-model:current-list-index="info.currentListIndex"
+        @update:lists="updateLists"
+        @insert-musics="insertMusics"
+        @open="open"
+      />
+      <lrc class="lrc" :key="current.music?.filePath" :music="current.music" />
+    </div>
   </div>
 </template>
 
@@ -25,6 +28,7 @@ import CustomAudio from '@/renderer/classes/custom-audio.js'
 import Info from '@/renderer/classes/info.js'
 import MusicLists from './music-lists.vue'
 import Player from './player.vue'
+import Lrc from './lrc.vue'
 
 function shuffle(arr) {
   const rands = Array(arr.length)
@@ -44,6 +48,7 @@ export default {
   components: {
     MusicLists,
     Player,
+    Lrc,
   },
   data() {
     return {
@@ -97,7 +102,10 @@ export default {
       this.current.music.gain = this.info.volume = volume
     },
     async open(music, list, index) {
-      const newMusic = await CustomAudio.construct(music.path, this.info.volume ?? 1)
+      const newMusic = await CustomAudio.construct(
+        music.path,
+        this.info.volume ?? 1
+      )
       if (this.current.music) {
         this.current.music.stop()
         this.current.list.musics[this.current.index].isPlaying = false
@@ -123,8 +131,17 @@ export default {
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  .music-lists {
+  .content {
+    min-height: 0;
     flex-grow: 1;
+    .music-lists {
+      width: 600px;
+      flex-shrink: 0;
+    }
+    .lrc {
+      flex-shrink: 0;
+    }
+    display: flex;
   }
 }
 </style>
