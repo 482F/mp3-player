@@ -68,6 +68,7 @@ html {
             flex-grow: 1;
           }
           * {
+            outline: none;
             &::-webkit-scrollbar-track {
               background-color: #eee;
             }

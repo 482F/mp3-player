@@ -1,5 +1,10 @@
 <template>
-  <div class="music-item" v-intersect="onIntersect">
+  <div
+    tabindex="0"
+    @keydown="onKeydown"
+    class="music-item"
+    v-intersect="onIntersect"
+  >
     <v-list-item v-if="isIntersect">
       <div class="playing-icon">
         <v-icon v-show="music.isPlaying">mdi-play</v-icon>
@@ -34,6 +39,11 @@ export default {
     },
   },
   methods: {
+    onKeydown({ code }) {
+      if (code === 'Delete') {
+        this.$emit('delete')
+      }
+    },
     onIntersect(entries, observer) {
       this.isIntersect = entries
     },

@@ -17,6 +17,7 @@
         @update:lists="updateLists"
         @insert-musics="insertMusics"
         @open="open"
+        @delete-item="deleteItem"
       />
       <lrc class="lrc" :key="current.music?.filePath" :music="current.music" />
     </div>
@@ -61,6 +62,9 @@ export default {
     await this.initInfo()
   },
   methods: {
+    deleteItem({ musics }, i) {
+      musics.splice(i, 1)
+    },
     shuffle() {
       this.$refs.musicLists.currentList.musics = shuffle(
         this.$refs.musicLists.currentList.musics

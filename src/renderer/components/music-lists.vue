@@ -35,6 +35,7 @@
       :key="currentListIndex"
       :musics="currentList?.musics ?? []"
       @insert-musics="(files) => $emit('insert-musics', currentList, files)"
+      @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
     />
   </div>
