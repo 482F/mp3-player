@@ -1,6 +1,7 @@
 const id3 = require('node-id3')
 const mp3Duration = require('mp3-duration')
 const fs = require('./fs.js')
+const path = require('path')
 
 function snakeKeyToCamel(obj) {
   const newObj = {}
@@ -59,6 +60,57 @@ const writeLyric = async (musicPath, lyric) => {
   } catch {
     return ''
   }
+}
+
+const getAllPaths = async (targetPaths, filterExts = null) => {
+  const paths = []
+  for (const targetPath of targetPaths) {
+    if (await fs.stat(targetPath).then((stats) => stats.isDirectory())) {
+      const children = await fs.readdir(targetPath)
+      for (const child of children) {
+        const absPath = path.join(targetPath, child)
+        if (await fs.stat(absPath).then((stats) => stats.isDirectory())) {
+          paths.push(...(await getAllPaths([absPath], filterExts)))
+        } else {
+          if (
+            !filterExts ||
+            filterExts.includes(child.match(fs.extPattern)[1])
+          ) {
+            paths.push(absPath)
+          }
+        }
+      }
+    } else {
+      paths.push(targetPath)
+    }
+  }
+  return paths
+}
+
+const getAllMusicPaths = async (targetPaths) => {
+  const paths = await getAllPaths(targetPaths, ['mp3', 'm3u8'])
+  const { music: musicPaths, playlist: playlistPaths } = paths.reduce(
+    (all, path) => {
+      const ext = path.match(fs.extPattern)[1]
+      if (['mp3'].includes(ext)) {
+        all.music.push(path)
+      } else if (['m3u8'].includes(ext)) {
+        all.playlist.push(path)
+      }
+      return all
+    },
+    { music: [], playlist: [] }
+  )
+  await Promise.all(
+    playlistPaths.map(async (playlistPath) => {
+      const playlist = (await fs.readFile(playlistPath, 'utf-8'))
+        .replaceAll('\r', '')
+        .split('\n')
+        .filter((line) => !['#', undefined].includes(line[0]))
+      musicPaths.push(...playlist)
+    })
+  )
+  return musicPaths.filter(fs.existsSync)
 }
 
 const db = createDbProxy('E:\\info.mp-sq3')
@@ -279,6 +331,11 @@ info.playlists.insertMusicsByPaths = async (playlistId, idx, paths) => {
   return musics
 }
 
+info.playlists.insertAllByPaths = async (playlistId, idx, paths) => {
+  const expandedPaths = await getAllMusicPaths(paths)
+  return info.playlists.insertMusicsByPaths(playlistId, idx, expandedPaths)
+}
+
 // TODO: 単一の項目に関してのみ呼び出しができるため N+1 になりうる
 info.playlists.removeMusic = async (playlistId, idx) => {
   await db.run(
@@ -414,7 +471,15 @@ info.musics.insertIfNeededAndGet = async (paths) => {
     ),
   ]
   if (unregisteredUniquePaths.length) {
-    const newMusics = await info.musics.insert(unregisteredUniquePaths)
+    const maxLength = 100
+    const newMusics = []
+    for (let i = 0; i < unregisteredUniquePaths.length / maxLength; i++) {
+      newMusics.push(
+        ...(await info.musics.insert(
+          unregisteredUniquePaths.slice(i * maxLength, (i + 1) * maxLength)
+        ))
+      )
+    }
     for (const music of newMusics) {
       musicDict[music.path] = music
     }

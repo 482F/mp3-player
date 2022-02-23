@@ -21,7 +21,7 @@ export default class Playlist {
 
   async insertMusics(index, paths) {
     const musics = (
-      await info.playlists.insertMusicsByPaths(this.id, index, paths)
+      await info.playlists.insertAllByPaths(this.id, index, paths)
     ).map((music, i) => new Music(this, this._musics.length + i, music))
     this._musics.splice(index, 0, ...musics)
     this.recalcIndice()
