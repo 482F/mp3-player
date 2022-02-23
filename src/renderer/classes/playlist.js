@@ -3,7 +3,8 @@ import Music from './music.js'
 const info = window.info
 
 export default class Playlist {
-  constructor({ id, name, isDisplay, displayIdx, playingIdx, musics }) {
+  constructor(index, { id, name, isDisplay, displayIdx, playingIdx, musics }) {
+    this.index = index
     this._id = id
     this._name = name
     this._isDisplay = isDisplay
