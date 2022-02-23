@@ -57,14 +57,14 @@ export default {
     offsets() {
       return this.lyricData.map((column, i) => {
         const currentIndex = this.currentIndice[i]
-        if (currentIndex === -1 || !this.$refs.columns?.[i]) {
+        const lines = [...(this.$refs.columns?.[i]?.children ?? [])]
+        if (currentIndex === -1 || lines.length <= currentIndex) {
           return 0
         }
         const partStart = column[currentIndex].time
         const partEnd = column[currentIndex + 1]?.time ?? Infinity
         const decimalPart =
           (this.currentTime - partStart) / (partEnd - partStart)
-        const lines = [...this.$refs.columns[i].children]
         const pastLinesHeight = lines
           .slice(0, currentIndex)
           .map((line) => line.clientHeight)
