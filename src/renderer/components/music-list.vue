@@ -77,11 +77,13 @@ export default {
 
 <style lang="scss" scoped>
 .music-list {
-  .music-item {
-    user-select: none;
-  }
-  .dragging {
-    opacity: 0.6;
+  > .v-list {
+    .music-item {
+      user-select: none;
+    }
+    .dragging {
+      opacity: 0.6;
+    }
   }
 }
 </style>

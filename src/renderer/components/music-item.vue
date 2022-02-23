@@ -5,19 +5,25 @@
     v-intersect="onIntersect"
   >
     <v-list-item v-if="isIntersect && music?.id">
-      <div class="playing-icon">
-        <v-icon v-show="music.isPlaying">mdi-play</v-icon>
-      </div>
-      <div>{{ music.title }}</div>
-      <div class="rating">
-        <v-icon
-          v-for="i of 5"
-          :key="i"
-          size="x-small"
-          @click="music.rating = i"
-        >
-          {{ i <= (music.rating ?? 0) ? 'mdi-star' : 'mdi-star-outline' }}
-        </v-icon>
+      <div class="content">
+        <div class="left">
+          <div class="playing-icon">
+            <v-icon v-show="music.isPlaying">mdi-play</v-icon>
+          </div>
+          <div class="title">{{ music.title }}</div>
+        </div>
+        <div class="right">
+          <div class="rating">
+            <v-icon
+              v-for="i of 5"
+              :key="i"
+              size="x-small"
+              @click="music.rating = i"
+            >
+              {{ i <= (music.rating ?? 0) ? 'mdi-star' : 'mdi-star-outline' }}
+            </v-icon>
+          </div>
+        </div>
       </div>
     </v-list-item>
   </div>
@@ -47,19 +53,37 @@ export default {
 
 <style lang="scss" scoped>
 .music-item {
-  position: relative;
   height: 40px;
   &.invalid {
     background-color: lightgray;
   }
-  .v-list-item {
-    .playing-icon {
-      width: 32px;
-    }
-    .rating {
-      position: absolute;
-      right: 0;
-      padding-right: 16px;
+  > .v-list-item {
+    .content {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      > .left,
+      > .right {
+        display: flex;
+      }
+      > .left {
+        overflow: hidden;
+        > .playing-icon {
+          flex-shrink: 0;
+          width: 32px;
+        }
+        > .title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      > .right {
+        flex-shrink: 0;
+        > .rating {
+          padding-right: 16px;
+        }
+      }
     }
   }
 }
