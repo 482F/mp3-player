@@ -92,7 +92,6 @@ const db = createDbProxy('E:\\info.mp-sq3')
   );`)
   await db.run(`
   CREATE TABLE IF NOT EXISTS playlists_musics (
-    id          INTEGER UNIQUE NOT NULL PRIMARY KEY  ,
     idx         INTEGER        NOT NULL              ,
     playlist_id INTEGER        NOT NULL              ,
     music_id    INTEGER        NOT NULL              ,
@@ -228,35 +227,98 @@ info.playlists.getAll = async () => {
         playlist.isDisplay = Boolean(playlist.isDisplay)
         const musicIds = (
           await db.all(
-            `SELECT id FROM playlists_musics
+            `SELECT music_id FROM playlists_musics
             WHERE playlist_id = ?
             ORDER BY idx ASC`,
             playlist.id
           )
-        ).map((row) => row.id)
+        ).map((row) => row.music_id)
         playlist.musics = await info.musics.getByIds(musicIds)
         return playlist
       })
   )
 }
 
-info.playlists.insertMusic = async (playlistId, idx, paths) => {
-  const musics = await info.musics.insertIfNeededAndGet(paths)
+info.playlists.insertMusicsByIds = async (playlistId, idx, ids) => {
+  // TODO: 普通に update すると unique 制約に引っかかるので、
+  // 一旦負のインデックスを設定して後で正のインデックスに直している
+  // N+1 とどちらが良いんだろうか・・・
   await db.run(
-    `UPDATE playlists_musics SET idx = idx + ? WHERE idx <= ?`,
-    paths.length,
+    `UPDATE playlists_musics SET idx = -1 * (idx + ?)
+      WHERE playlist_id = ?
+        AND ? <= idx`,
+    ids.length,
+    playlistId,
     idx
   )
-  const values = musics.map(({ id }) => [idx++, playlistId, id])
+  await db.run(
+    `UPDATE playlists_musics SET idx = -1 * idx
+      WHERE playlist_id = ?
+        AND idx < 0`,
+    playlistId
+  )
+  const values = ids.map((id) => [idx++, playlistId, id])
   await db.run(
     `INSERT INTO playlists_musics (
     idx,
     playlist_id,
     music_id
-  ) VALUES ${repeatPlaceholder('(?, ?, ?)', paths.length)}`,
+  ) VALUES ${repeatPlaceholder('(?, ?, ?)', ids.length)}`,
     ...values.flat()
   )
+}
+
+info.playlists.insertMusicsByPaths = async (playlistId, idx, paths) => {
+  const musics = await info.musics.insertIfNeededAndGet(paths)
+  await info.playlists.insertMusicsByIds(
+    playlistId,
+    idx,
+    musics.map(({ id }) => id)
+  )
   return musics
+}
+
+// TODO: 単一の項目に関してのみ呼び出しができるため N+1 になりうる
+info.playlists.removeMusic = async (playlistId, idx) => {
+  await db.run(
+    `DELETE FROM playlists_musics
+    WHERE playlist_id = ?
+      AND idx = ?`,
+    playlistId,
+    idx
+  )
+  await db.run(
+    `UPDATE playlists_musics SET idx = -1 * (idx - 1)
+      WHERE playlist_id = ?
+        AND ? <= idx`,
+    playlistId,
+    idx
+  )
+  await db.run(
+    `UPDATE playlists_musics SET idx = -1 * idx
+      WHERE playlist_id = ?
+        AND idx < 0`,
+    playlistId
+  )
+}
+
+// TODO: 単一の項目に関してのみ呼び出しができるため N+1 になりうる
+info.playlists.moveMusic = async (playlistId, oldIdx, newIdx) => {
+  if (oldIdx === newIdx) {
+    return
+  }
+
+  const musicId = (
+    await db.get(
+      `SELECT music_id FROM playlists_musics
+      WHERE playlist_id = ?
+        AND idx = ?`,
+      playlistId,
+      oldIdx
+    )
+  ).music_id
+  await info.playlists.removeMusic(playlistId, oldIdx)
+  await info.playlists.insertMusicsByIds(playlistId, newIdx, [musicId])
 }
 
 info.playlists.updateName = async (playlistId, value) => {
@@ -264,7 +326,11 @@ info.playlists.updateName = async (playlistId, value) => {
 }
 
 info.playlists.updateIsDisplay = async (playlistId, value) => {
-  await db.run(`UPDATE playlists SET is_display = ? WHERE id = ?`, value ? 1 : 0, playlistId)
+  await db.run(
+    `UPDATE playlists SET is_display = ? WHERE id = ?`,
+    value ? 1 : 0,
+    playlistId
+  )
 }
 
 info.musics.insert = async (paths) => {

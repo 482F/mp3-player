@@ -9,16 +9,22 @@ export default class Playlist {
     this._isDisplay = isDisplay
     this._displayIndex = displayIdx
     this._playingIndex = playingIdx
-    this._musics = musics.map((music, i) => music ? new Music(this, i, music) : {})
+    this._musics = musics.map((music, i) =>
+      music ? new Music(this, i, music) : {}
+    )
   }
 
   async insertMusics(index, paths) {
-    const musics = await info.playlists.insertMusic(this.id, index, paths)
-    this._musics.push(
-      ...(musics, i).map(
-        (music) => new Music(this, this._musics.length + i, music)
-      )
-    )
+    const musics = (
+      await info.playlists.insertMusicsByPaths(this.id, index, paths)
+    ).map((music, i) => new Music(this, this._musics.length + i, music))
+    this._musics.splice(index, 0, ...musics)
+  }
+
+  async moveMusic(oldIndex, newIndex) {
+    // vuedraggable で既に this.musics は変更されているので db と this.musics[i].index を変更する
+    this.musics.forEach((music, i) => (music.index = i))
+    await info.playlists.moveMusic(this.id, oldIndex, newIndex)
   }
 
   get id() {
