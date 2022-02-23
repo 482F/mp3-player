@@ -58,6 +58,7 @@ export default {
     background-color: lightgray;
   }
   > .v-list-item {
+    padding: 0px !important;
     .content {
       width: 100%;
       display: flex;
@@ -69,6 +70,9 @@ export default {
       > .left {
         overflow: hidden;
         > .playing-icon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
           flex-shrink: 0;
           width: 32px;
         }
