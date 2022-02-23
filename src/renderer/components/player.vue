@@ -33,7 +33,12 @@
         </div>
         <div class="right">
           <v-icon @click="$emit('export')">mdi-content-save</v-icon>
-          <v-icon>mdi-sync</v-icon>
+          <v-icon
+            @click="$emit('update:loop', !loop)"
+            :color="loop ? 'black' : '#ccc'"
+          >
+            mdi-sync
+          </v-icon>
           <v-icon @click="$emit('shuffle')">mdi-shuffle</v-icon>
         </div>
       </div>
@@ -65,6 +70,10 @@ export default {
     volume: {
       type: Number,
       default: 1,
+    },
+    loop: {
+      type: Boolean,
+      default: false,
     },
   },
   mounted() {},

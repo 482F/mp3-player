@@ -3,7 +3,9 @@
     <player
       :music="current.music"
       :volume="info.volume ?? 1"
+      :loop="info.loop ?? false"
       @update:volume="updateVolume"
+      @update:loop="(value) => info.loop = value"
       @skip="skip"
       @shuffle="shuffle"
       @export="info.export()"
