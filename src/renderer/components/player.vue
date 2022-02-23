@@ -14,7 +14,7 @@
         <v-icon v-show="!music?.isPlaying" @click="start" size="x-large">
           mdi-play
         </v-icon>
-        <v-icon v-show="music?.isPlaying" @click="music.stop()" size="x-large">
+        <v-icon v-show="music?.isPlaying" @click="music.pause()" size="x-large">
           mdi-pause
         </v-icon>
         <v-icon @click="$emit('skip', 1)">mdi-skip-next</v-icon>
