@@ -1,6 +1,9 @@
 <template>
   <div class="music-lists">
-    <div class="lists" @mousewheel="(e) => moveList(Math.sign(-e.wheelDelta))">
+    <div
+      class="lists"
+      @mousewheel.prevent="(e) => moveList(Math.sign(-e.wheelDelta))"
+    >
       <v-list-item
         ref="list"
         class="item"
@@ -93,7 +96,12 @@ export default {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
   .lists {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -113,7 +121,6 @@ export default {
   }
   .music-list {
     flex-grow: 1;
-    overflow-y: scroll;
   }
 }
 </style>
