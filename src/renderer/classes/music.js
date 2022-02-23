@@ -16,6 +16,7 @@ export default class Playlist {
   }
 
   async open(gain = 1) {
+    this.isPlaying = true
     this.list.playingIndex = this.index
     this._gain = gain
     this.file = await readFile(this.path)
