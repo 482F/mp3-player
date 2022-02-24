@@ -114,11 +114,13 @@ export default {
 
 <style lang="scss" scoped>
 .f-player {
+  height: 200px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   .info {
-    height: 64px;
+    padding-top: 16px;
     .name {
       font-size: 24px;
     }
@@ -131,7 +133,6 @@ export default {
     appearance: none;
     background: lightgray;
     height: var(--height);
-    margin: 8px;
     width: 100%;
     outline: 0;
     overflow: hidden;
@@ -144,8 +145,9 @@ export default {
     }
   }
   .control {
-    width: calc(100% - 16px);
+    width: 100%;
     display: flex;
+    gap: 8px;
     flex-direction: column;
     align-items: center;
     > * {
@@ -161,6 +163,7 @@ export default {
       justify-content: center;
     }
     .between {
+      padding: 0 16px;
       justify-content: space-between;
     }
   }
