@@ -1,40 +1,51 @@
 <template>
   <div class="music-lists">
-    <div
-      class="lists"
-      @mousewheel.prevent="(e) => moveList(Math.sign(-e.wheelDelta))"
-    >
-      <v-list-item
-        ref="list"
-        class="item"
-        :class="info.currentListIndex === list.index ? 'current' : ''"
-        :rounded="0"
-        v-for="list of lists.filter((list) => list.isDisplay)"
-        :key="list.id"
-        @mousedown.left="info.currentListIndex = list.index"
-        @dblclick="renameList(list, list.index)"
-        @click.middle="list.isDisplay = false"
+    <div class="header">
+      <div
+        class="lists"
+        @mousewheel.prevent="(e) => moveList(Math.sign(-e.wheelDelta))"
       >
-        <span v-show="list.renaming">
-          <input
-            ref="renamer"
-            class="renamer"
-            type="text"
-            :value="list.name"
-            @blur="(e) => endRename(list, e.target.value)"
-            @keypress.enter="(e) => endRename(list, e.target.value)"
-          />
-        </span>
-        <span v-show="!list.renaming">{{ list.name }}</span>
-      </v-list-item>
-      <v-icon @click="addList">mdi-plus</v-icon>
+        <v-list-item
+          ref="list"
+          class="item"
+          :class="info.currentListIndex === list.index ? 'current' : ''"
+          :rounded="0"
+          v-for="list of lists.filter((list) => list.isDisplay)"
+          :key="list.id"
+          @mousedown.left="info.currentListIndex = list.index"
+          @dblclick="renameList(list, list.index)"
+          @click.middle="list.isDisplay = false"
+        >
+          <span v-show="list.renaming">
+            <input
+              ref="renamer"
+              class="renamer"
+              type="text"
+              :value="list.name"
+              @blur="(e) => endRename(list, e.target.value)"
+              @keypress.enter="(e) => endRename(list, e.target.value)"
+            />
+          </span>
+          <span v-show="!list.renaming">{{ list.name }}</span>
+        </v-list-item>
+        <v-icon class="plus" @click="addList">mdi-plus</v-icon>
+      </div>
+      <v-icon
+        class="sort"
+        @click="scrollToPlayingItem"
+        :color="autoScroll ? 'black' : '#ccc'"
+      >
+        mdi-debug-step-into
+      </v-icon>
     </div>
     <music-list
       class="music-list"
+      ref="musicList"
       :key="info.currentListIndex"
       :list="lists[info.currentListIndex]"
       @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
+      @mousewheel="autoScroll = false"
     />
   </div>
 </template>
@@ -48,7 +59,9 @@ export default {
     MusicList,
   },
   data() {
-    return {}
+    return {
+      autoScroll: false,
+    }
   },
   props: {
     lists: {
@@ -90,6 +103,22 @@ export default {
         list.name = newName
       }
     },
+    scrollToPlayingItem() {
+      this.autoScroll = true
+      const items = [...this.$refs.musicList.$refs.list.$el.children]
+      items[this.currentList.playingIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    },
+  },
+  watch: {
+    'currentList.playingIndex': function () {
+      if (!this.autoScroll) {
+        return
+      }
+      this.scrollToPlayingItem()
+    },
   },
 }
 </script>
@@ -100,26 +129,38 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
-  .lists {
+  .header {
+    width: 100%;
     position: sticky;
     top: 0;
     background-color: white;
     z-index: 1;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    flex-shrink: 0;
-    overflow-y: hidden;
-    overflow-x: scroll;
-    &::-webkit-scrollbar {
-      width: 0px !important;
-      height: 0px !important;
-    }
-    .item {
-      background-color: #eee;
-      user-select: none;
-      &.current {
-        background-color: #c7b897;
+    .lists {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      overflow-y: hidden;
+      overflow-x: scroll;
+      &::-webkit-scrollbar {
+        width: 0px !important;
+        height: 0px !important;
       }
+      .item {
+        background-color: #eee;
+        user-select: none;
+        &.current {
+          background-color: #c7b897;
+        }
+      }
+      .plus {
+        margin-left: 4px;
+      }
+    }
+    .sort {
+      margin-right: 4px;
     }
   }
   .music-list {
