@@ -25,6 +25,7 @@
     "electron-store": "^8.0.1",
     "fs-extra": "^10.0.1",
     "json5": "^2.2.0",
+    "lodash": "^4.17.21",
     "mp3-duration": "^1.1.0",
     "node-id3": "^0.2.3",
     "npm-run-all": "^4.1.5",
