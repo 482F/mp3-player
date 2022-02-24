@@ -84,6 +84,7 @@ export default class Playlist {
   }
 
   start(offset) {
+    this._createSource()
     offset = offset !== undefined ? offset * 1000 : this._currentTime ?? 0 * 1000
     this._startTime = new Date().getTime() - offset
     this._intervalId = setInterval(() => this._interval(), 10)
@@ -94,9 +95,8 @@ export default class Playlist {
     if (this.isPlaying) {
       clearInterval(this._intervalId)
       this._intervalId = null
-      this._source.stop()
-      this._createSource()
       this.isPlaying = false
+      this._source?.stop?.()
     }
   }
 
