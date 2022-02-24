@@ -13,15 +13,15 @@
     </div>
     <div class="control">
       <div class="center">
-        <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
-        <v-icon @click="stop" size="x-large"> mdi-stop </v-icon>
-        <v-icon v-show="!music?.isPlaying" @click="start" size="x-large">
+        <v-icon class="normal" @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
+        <v-icon class="large" @click="stop" size="x-large"> mdi-stop </v-icon>
+        <v-icon class="large" v-show="!music?.isPlaying" @click="start">
           mdi-play
         </v-icon>
-        <v-icon v-show="music?.isPlaying" @click="music.pause()" size="x-large">
+        <v-icon class="large" v-show="music?.isPlaying" @click="music.pause()">
           mdi-pause
         </v-icon>
-        <v-icon @click="$emit('skip', 1)">mdi-skip-next</v-icon>
+        <v-icon class="normal" @click="$emit('skip', 1)">mdi-skip-next</v-icon>
       </div>
       <div class="between">
         <div class="left">

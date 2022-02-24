@@ -167,3 +167,14 @@ export default {
   }
 }
 </style>
+
+<style lang="scss">
+.v-icon {
+  &.large {
+    font-size: 3rem;
+  }
+  &.normal {
+    font-size: 2rem;
+  }
+}
+</style>
