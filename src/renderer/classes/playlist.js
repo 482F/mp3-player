@@ -63,6 +63,7 @@ export default class Playlist {
     // vuedraggable で既に this.musics は変更されているので db と this.musics[i].index を変更する
     await info.playlists.moveMusic(this.id, oldIndex, newIndex)
     this.recalcIndice()
+    this.playingIndex = this.musics.findIndex((music) => music.isPlaying)
   }
 
   get id() {
