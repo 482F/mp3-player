@@ -12,7 +12,7 @@
           <div class="left">{{ music.album || '[no album]' }}</div>
         </div>
         <div>
-          {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
+          {{ $formatTime(music.currentTime) }} / {{ $formatTime(music.length) }}
         </div>
       </div>
     </div>
@@ -117,14 +117,6 @@ export default {
       if (this.music) {
         this.music.currentTime = time
       }
-    },
-    formatTime(time) {
-      const f = (num) => Math.floor(num).toString().padStart(2, '0')
-      const hour = Math.floor(time / (60 * 60))
-      const minute = f((time % (60 * 60)) / 60)
-      const second = f(time % 60)
-      const millisecond = f((time * 100) % 100)
-      return `${hour ? hour + ':' : ''}${minute}:${second}.${millisecond}`
     },
   },
 }

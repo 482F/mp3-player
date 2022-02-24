@@ -13,6 +13,7 @@
           <div class="title">{{ music.title }}</div>
         </div>
         <div class="right">
+          <div class="length">[{{ $formatTime(music.length, false) }}]</div>
           <div class="rating">
             <v-icon
               v-for="i of 5"
@@ -84,8 +85,13 @@ export default {
       }
       > .right {
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
         > .rating {
           padding-right: 16px;
+          display: flex;
+          align-items: center;
         }
       }
     }
