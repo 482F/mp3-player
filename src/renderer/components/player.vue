@@ -124,12 +124,12 @@ export default {
 
 <style lang="scss" scoped>
 .f-player {
-  height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   .info {
+    height: 100px;
     width: 100%;
     padding-top: 4px;
     .name {
