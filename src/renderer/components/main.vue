@@ -3,9 +3,8 @@
     <player
       :music="current.music"
       :volume="info.volume ?? 1"
-      :loop="info.loop ?? false"
+      v-model:loop="info.loop"
       @update:volume="updateVolume"
-      @update:loop="(value) => (info.loop = value)"
       @skip="skip"
       @shuffle="shuffle"
       @export="info.export()"
@@ -14,7 +13,7 @@
       <music-lists
         ref="musicLists"
         class="music-lists"
-        :lists="info.lists"
+        :lists="info.playlists"
         v-model:current-list-index="info.currentListIndex"
         @update:lists="updateLists"
         @insert-musics="insertMusics"
@@ -64,10 +63,12 @@ export default {
       currentMusic: null,
       current: {},
       editing: false,
+      ready: false,
     }
   },
   async mounted() {
     await this.initInfo()
+    this.ready = true
   },
   methods: {
     onKeydown(e) {
@@ -112,7 +113,7 @@ export default {
     },
     async initInfo() {
       this.info = new Info()
-      this.info.import('E:\\info.mp5')
+      await this.info.init()
     },
     async insertMusics(targetList, droppedFiles) {
       console.log({ targetList, droppedFiles })
