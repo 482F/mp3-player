@@ -43,7 +43,7 @@ export default class Info {
     return this._volume
   }
   set volume(value) {
-    this._volume
+    this._volume = value
     this.saveVolume(value)
   }
 
