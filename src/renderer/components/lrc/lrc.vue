@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     lyricData() {
-      return this.rawLyric
+      const data = this.rawLyric
         .split('\n')
         .map((line) => {
           const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/)
@@ -77,6 +77,22 @@ export default {
           }
         })
         .filter(Boolean)
+      const maxDiff = 3000
+      for (let i = 0; i < data.length - 1; i++) {
+        const start = data[i].time
+        const end = data[i + 1].time
+        const diff = end - start
+        if (data[i].text === '' && maxDiff <= diff) {
+          const numberOfPadding = Math.floor(diff / maxDiff)
+          const times = Array(numberOfPadding)
+            .fill(0)
+            .map((_, i) => (diff * (i + 1)) / (numberOfPadding + 1) + start)
+            .map(Math.round)
+          data.splice(i + 1, 0, ...times.map((time) => ({ time, text: '' })))
+          i += numberOfPadding
+        }
+      }
+      return data
     },
   },
   watch: {
