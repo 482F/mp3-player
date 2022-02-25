@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import CustomAudio from '@/renderer/classes/custom-audio.js'
 import Info from '@/renderer/classes/info.js'
 import MusicLists from './music-lists.vue'
 import Player from './player.vue'
@@ -143,24 +142,17 @@ export default {
       this.current.music.gain = this.info.volume = volume
     },
     async open(music, list, index) {
-      const newMusic = await CustomAudio.construct(
-        music.path,
-        this.info.volume ?? 1
-      )
       if (this.current.music) {
         this.current.music.stop()
-        this.current.list.musics[this.current.index].isPlaying = false
       }
-      this.current.list = list
-      this.current.index = index
-      list.musics[index].isPlaying = true
-      this.current.music = newMusic
+      this.current.music = music
+      await music.open()
       this.current.music.start()
       this.current.music.onended = () => this.onended()
     },
     async onended() {
       if (this.info.loop || this.editing) {
-        this.current.music.stop()
+        this.current.music.pause()
         this.current.music.start(0)
       } else {
         await this.skip(1)
