@@ -14,7 +14,7 @@ export default class Playlist {
   }
 
   async open(gain = 1) {
-    this.file = await readFile(path)
+    this.file = await readFile(this.path)
     const buffer = this.file.buffer
     this._audioCtx = new AudioContext()
     this._audioBuffer = await new Promise((resolve) =>
