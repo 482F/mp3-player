@@ -96,7 +96,7 @@ const db = createDbProxy('E:\\info.mp-sq3')
     idx         INTEGER        NOT NULL              ,
     playlist_id INTEGER        NOT NULL              ,
     music_id    INTEGER        NOT NULL              ,
-    UNIQUE(idx, playlist_id, music_id)               ,
+    UNIQUE(idx, playlist_id)                         ,
     FOREIGN KEY(playlist_id) REFERENCES playlists(id),
     FOREIGN KEY(music_id) REFERENCES musics(id)
   );`)
