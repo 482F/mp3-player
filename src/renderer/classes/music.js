@@ -110,6 +110,6 @@ export default class Playlist {
   }
   set lyric(value) {
     this._lyric = value
-    return this.musics.updateLyric(value)
+    info.musics.updateLyric(this.path, value)
   }
 }
