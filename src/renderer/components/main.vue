@@ -15,10 +15,7 @@
         class="music-lists"
         :lists="info.playlists"
         v-model:current-list-index="info.currentListIndex"
-        @update:lists="updateLists"
-        @insert-musics="insertMusics"
         @open="open"
-        @delete-item="deleteItem"
       />
       <lrc
         class="lrc"
@@ -64,6 +61,16 @@ export default {
       current: {},
       editing: false,
       ready: false,
+    }
+  },
+  computed: {
+    info() {
+      return this.$store.state.info
+    },
+  },
+  provide() {
+    return {
+      info: () => this.info,
     }
   },
   async mounted() {
@@ -112,8 +119,9 @@ export default {
       )
     },
     async initInfo() {
-      this.info = new Info()
-      await this.info.init()
+      const info = new Info()
+      await info.init()
+      this.$store.dispatch('setInfo', info)
     },
     async insertMusics(targetList, droppedFiles) {
       console.log({ targetList, droppedFiles })
