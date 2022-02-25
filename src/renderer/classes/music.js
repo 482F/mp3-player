@@ -6,7 +6,7 @@ export default class Playlist {
   constructor({ id, path, length, title, artist, album, lyric }) {
     this._id = id
     this._path = path
-    this._lenght = length
+    this._length = length / 1000
     this._title = title
     this._artist = artist
     this._album = album
