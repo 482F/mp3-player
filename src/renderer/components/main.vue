@@ -122,9 +122,6 @@ export default {
       await info.init()
       this.$store.dispatch('setInfo', info)
     },
-    updateLists(lists) {
-      this.info.lists = lists
-    },
     updateVolume(volume) {
       this.current.music.gain = this.info.volume = volume
     },
