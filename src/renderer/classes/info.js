@@ -6,6 +6,8 @@ const throttle = window.requires.throttle
 export default class Info {
   constructor() {}
   async init() {
+    this.current = {}
+
     const defaultSettings = {
       volume: 1,
       currentListIndex: 0,

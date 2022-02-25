@@ -1,7 +1,7 @@
 <template>
-  <div class="f-main" tabindex="0" @keydown="onKeydown">
+  <div v-if="ready" class="f-main" tabindex="0" @keydown="onKeydown">
     <player
-      :music="current.music"
+      :music="info.current.music"
       :volume="info.volume"
       v-model:loop="info.loop"
       @update:volume="updateVolume"
@@ -13,13 +13,12 @@
         ref="musicLists"
         class="music-lists"
         :lists="info.playlists"
-        v-model:current-list-index="info.currentListIndex"
         @open="open"
       />
       <lrc
         class="lrc"
-        :key="current.music?.path"
-        :music="current.music"
+        :key="info.current.music?.path"
+        :music="info.current.music"
         v-model:editing="editing"
       />
     </div>
@@ -54,8 +53,6 @@ export default {
   },
   data() {
     return {
-      currentMusic: null,
-      current: {},
       editing: false,
       ready: false,
     }
@@ -87,9 +84,9 @@ export default {
       }
     },
     shiftMusicTime(delta) {
-      if (this.current.music) {
-        this.current.music.currentTime = Math.max(
-          this.current.music.currentTime + delta,
+      if (this.info.current.music) {
+        this.info.current.music.currentTime = Math.max(
+          this.info.current.music.currentTime + delta,
           0
         )
       }
@@ -101,19 +98,17 @@ export default {
       this.$refs.musicLists.currentList.musics = shuffle(
         this.$refs.musicLists.currentList.musics
       )
-      this.current.index = this.$refs.musicLists.currentList.musics.findIndex(
-        (music) => music.isPlaying
-      )
+      this.info.current.index =
+        this.$refs.musicLists.currentList.musics.findIndex(
+          (music) => music.isPlaying
+        )
     },
     async skip(delta) {
-      const nextIndex =
-        (this.current.index + delta + this.current.list.musics.length) %
-        this.current.list.musics.length
-      await this.open(
-        this.current.list.musics[nextIndex],
-        this.current.list,
-        nextIndex
-      )
+      const currentList = this.info.current.music.list
+      const playingIndex = currentList.playingIndex
+      const length = currentList.length
+      const nextIndex = (playingIndex + delta + length) % length
+      await this.open(currentList.musics[nextIndex])
     },
     async initInfo() {
       const info = new Info()
@@ -121,21 +116,25 @@ export default {
       this.$store.dispatch('setInfo', info)
     },
     updateVolume(volume) {
-      this.current.music.gain = this.info.volume = volume
+      this.info.current.music.gain = this.info.volume = volume
     },
-    async open(music, list, index) {
-      if (this.current.music) {
-        this.current.music.stop()
+    async open(music) {
+      if (this.info.current.music) {
+        this.info.current.music.stop()
       }
-      this.current.music = music
+      this.info.current.music = music
       await music.open(this.info.volume)
-      this.current.music.start()
-      this.current.music.onended = () => this.onended()
+      // 他の曲が再生された場合
+      if (this.info.current.music !== music) {
+        return
+      }
+      this.info.current.music.start()
+      this.info.current.music.onended = () => this.onended()
     },
     async onended() {
       if (this.info.loop || this.editing) {
-        this.current.music.pause()
-        this.current.music.start(0)
+        this.info.current.music.pause()
+        this.info.current.music.start(0)
       } else {
         await this.skip(1)
       }

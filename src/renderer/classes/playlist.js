@@ -7,16 +7,16 @@ export default class Playlist {
     this._id = id
     this._name = name
     this._isDisplay = isDisplay
-    this._displayIdx = displayIdx
-    this._playingIdx = playingIdx
-    this._musics = musics.map((music) => new Music(music))
+    this._displayIndex = displayIdx
+    this._playingIndex = playingIdx
+    this._musics = musics.map((music) => music ? new Music(this, music) : {})
   }
 
-  async insertMusics(idx, paths) {
-    const musics = await info.playlists.insertMusic(this.id, idx, paths)
+  async insertMusics(index, paths) {
+    const musics = await info.playlists.insertMusic(this.id, index, paths)
     this._musics.push(
       ...(musics).map(
-        (music) => new Music(music)
+        (music) => new Music(this, music)
       )
     )
   }
@@ -41,19 +41,23 @@ export default class Playlist {
     info.playlists.updateIsDisplay(this.id, value)
   }
 
-  get displayIdx() {
-    return this._displayIdx
+  get displayIndex() {
+    return this._displayIndex
   }
 
-  get playingIdx() {
-    return this._playingIdx
+  get playingIndex() {
+    return this._playingIndex
   }
-  set playingIdx(value) {
-    this._playingIdx = value
+  set playingIndex(value) {
+    this._playingIndex = value
     info.playlists.updatePlayingIdx(this.id, value)
   }
 
   get musics() {
     return this._musics
+  }
+
+  get length() {
+    return this._musics.length
   }
 }
