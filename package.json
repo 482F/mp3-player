@@ -6,6 +6,7 @@
     "build": "cmd.exe /c yarn run run-s clean vite:build filecopy:preload background:build electron:build",
     "win:install": "cmd.exe /c yarn install",
     "win:add": "cmd.exe /c yarn add",
+    "win:remove": "cmd.exe /c yarn remove",
     "build:mac": "run-s clean vite:build electron:macbuild",
     "background:build": "rollup --config rollup.config.js",
     "vite:dev": "vite",
