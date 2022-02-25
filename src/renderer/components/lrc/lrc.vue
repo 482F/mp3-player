@@ -44,7 +44,6 @@ export default {
   data() {
     return {
       rawLyric: '',
-      lyricData: null,
       ready: false,
     }
   },
