@@ -33,19 +33,6 @@ import MusicLists from './music-lists.vue'
 import Player from './player.vue'
 import Lrc from './lrc/lrc.vue'
 
-function shuffle(arr) {
-  const rands = Array(arr.length)
-    .fill(0)
-    .map(() => Math.random())
-  const randAndIndice = rands.map((rand, i) => [rand, i])
-  const randIndice = randAndIndice
-    .sort(([rand1], [rand2]) => rand1 - rand2)
-    .map(([_, i]) => i)
-  const result = []
-  randIndice.forEach((index) => result.push(arr[index]))
-  return result
-}
-
 export default {
   name: 'main',
   components: {
@@ -96,14 +83,8 @@ export default {
     deleteItem({ musics }, i) {
       musics.splice(i, 1)
     },
-    shuffle() {
-      this.$refs.musicLists.currentList.musics = shuffle(
-        this.$refs.musicLists.currentList.musics
-      )
-      this.info.current.index =
-        this.$refs.musicLists.currentList.musics.findIndex(
-          (music) => music.isPlaying
-        )
+    async shuffle() {
+      await this.info.playlists[this.info.currentListIndex].shuffle()
     },
     async skip(delta) {
       const currentList = this.info.current.music.list

@@ -2,6 +2,19 @@ import Music from './music.js'
 
 const info = window.info
 
+function shuffle(arr) {
+  const rands = Array(arr.length)
+    .fill(0)
+    .map(() => Math.random())
+  const randAndIndice = rands.map((rand, i) => [rand, i])
+  const randIndice = randAndIndice
+    .sort(([rand1], [rand2]) => rand1 - rand2)
+    .map(([_, i]) => i)
+  const result = []
+  randIndice.forEach((index) => result.push(arr[index]))
+  return result
+}
+
 export default class Playlist {
   constructor(index, { id, name, isDisplay, displayIdx, playingIdx, musics }) {
     this.index = index
@@ -12,6 +25,19 @@ export default class Playlist {
     this._playingIndex = playingIdx
     this._musics = musics.map((music, i) =>
       music ? new Music(this, i, music) : {}
+    )
+  }
+
+  async shuffle() {
+    this._musics = shuffle(this.musics)
+    const oldIndice = this.musics.map((music) => music.index)
+    this.recalcIndice()
+    await info.playlists.moveMusics(
+      this.id,
+      oldIndice,
+      Array(this.musics.length)
+        .fill(0)
+        .map((_, i) => i)
     )
   }
 
