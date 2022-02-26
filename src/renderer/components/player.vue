@@ -27,7 +27,7 @@
           <input
             class="slider"
             type="range"
-            :max="500"
+            :max="1000"
             :value="volume * 100"
             @input="(e) => $emit('update:volume', e.target.valueAsNumber / 100)"
           />
