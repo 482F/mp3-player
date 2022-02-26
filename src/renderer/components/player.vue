@@ -1,5 +1,8 @@
 <template>
-  <div class="f-player">
+  <div
+    class="f-player"
+    @mousedown.middle.prevent="music?.isPlaying ? music.pause() : start()"
+  >
     <div class="info">
       <div v-if="music">
         <div class="name">{{ music.title }}</div>
@@ -11,9 +14,7 @@
     <div class="control">
       <div class="center">
         <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
-        <v-icon @click="stop" size="x-large">
-          mdi-stop
-        </v-icon>
+        <v-icon @click="stop" size="x-large"> mdi-stop </v-icon>
         <v-icon v-show="!music?.isPlaying" @click="start" size="x-large">
           mdi-play
         </v-icon>
