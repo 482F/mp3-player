@@ -44,7 +44,7 @@ export default class Playlist {
     this._currentTime = new Date().getTime() - this._startTime
     if (this.length <= this.currentTime) {
       this.pause()
-      this.onended()
+      this.onended?.()
     }
   }
 
@@ -75,6 +75,7 @@ export default class Playlist {
     this._intervalId = setInterval(() => this._interval(), 10)
     this._source.start(0, offset / 1000)
     this.isPlaying = true
+    this.list.playingIndex = this.index
   }
   pause() {
     if (this.isPlaying) {

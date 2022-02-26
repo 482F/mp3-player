@@ -333,6 +333,14 @@ info.playlists.updateIsDisplay = async (playlistId, value) => {
   )
 }
 
+info.playlists.updatePlayingIdx = async (playlistId, value) => {
+  await db.run(
+    `UPDATE playlists SET playing_idx = ? WHERE id = ?`,
+    value ? 1 : 0,
+    playlistId
+  )
+}
+
 info.musics.insert = async (paths) => {
   const values = await Promise.all(
     paths.map(async (path) => {
