@@ -7,12 +7,12 @@
       <v-list-item
         ref="list"
         class="item"
-        :class="currentListIndex === i ? 'current' : ''"
+        :class="info.currentListIndex === list.index ? 'current' : ''"
         :rounded="0"
-        v-for="(list, i) of lists.filter((list) => list.isDisplay)"
-        :key="i"
-        @mousedown.left="$emit('update:current-list-index', i)"
-        @dblclick="renameList(list, i)"
+        v-for="list of lists.filter((list) => list.isDisplay)"
+        :key="list.id"
+        @mousedown.left="info.currentListIndex = list.index"
+        @dblclick="renameList(list, list.index)"
         @click.middle="list.isDisplay = false"
       >
         <span v-show="list.renaming">
@@ -31,8 +31,8 @@
     </div>
     <music-list
       class="music-list"
-      :key="currentListIndex"
-      :list="lists[currentListIndex]"
+      :key="info.currentListIndex"
+      :list="lists[info.currentListIndex]"
       @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
     />
@@ -55,14 +55,10 @@ export default {
       type: Array,
       default: () => [],
     },
-    currentListIndex: {
-      type: Number,
-      default: 0,
-    },
   },
   computed: {
     currentList() {
-      return this.lists[this.currentListIndex]
+      return this.lists[this.info.currentListIndex]
     },
     info() {
       return this.$store.state.info
@@ -77,11 +73,9 @@ export default {
       this.info.insertPlaylists(['new' + i])
     },
     moveList(delta) {
-      this.$emit(
-        'update:current-list-index',
-        (this.currentListIndex + delta + this.lists.length) % this.lists.length
-      )
-      this.$refs.list[this.currentListIndex].$el.scrollIntoView({
+      this.info.currentListIndex +=
+        (delta + this.lists.length) % this.lists.length
+      this.$refs.list[this.info.currentListIndex].$el.scrollIntoView({
         behavior: 'smooth',
       })
     },
