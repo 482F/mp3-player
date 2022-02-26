@@ -7,31 +7,47 @@
       <div v-if="music">
         <div class="name">{{ music.title }}</div>
         <div>
+          {{ music.artist ?? '[no artist]' }} -
+          {{ music.album ?? '[no album]' }}
+        </div>
+        <div>
           {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
         </div>
       </div>
     </div>
     <div class="control">
-      <div class="center">
-        <v-icon class="normal" @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
-        <v-icon class="large" @click="stop" size="x-large"> mdi-stop </v-icon>
-        <v-icon class="large" v-show="!music?.isPlaying" @click="start">
-          mdi-play
-        </v-icon>
-        <v-icon class="large" v-show="music?.isPlaying" @click="music.pause()">
-          mdi-pause
-        </v-icon>
-        <v-icon class="normal" @click="$emit('skip', 1)">mdi-skip-next</v-icon>
-      </div>
       <div class="between">
         <div class="left">
-          <input
-            class="slider"
-            type="range"
-            :max="1000"
-            :value="volume * 100"
-            @input="(e) => $emit('update:volume', e.target.valueAsNumber / 100)"
-          />
+          <div class="slider-wrapper">
+            <input
+              class="slider"
+              type="range"
+              :max="1000"
+              :value="volume * 100"
+              @input="
+                (e) => $emit('update:volume', e.target.valueAsNumber / 100)
+              "
+            />
+          </div>
+        </div>
+        <div class="center">
+          <v-icon class="normal" @click="$emit('skip', -1)"
+            >mdi-skip-previous</v-icon
+          >
+          <v-icon class="large" @click="stop" size="x-large"> mdi-stop </v-icon>
+          <v-icon class="large" v-show="!music?.isPlaying" @click="start">
+            mdi-play
+          </v-icon>
+          <v-icon
+            class="large"
+            v-show="music?.isPlaying"
+            @click="music.pause()"
+          >
+            mdi-pause
+          </v-icon>
+          <v-icon class="normal" @click="$emit('skip', 1)"
+            >mdi-skip-next</v-icon
+          >
         </div>
         <div class="right">
           <v-icon
@@ -121,7 +137,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   .info {
-    padding-top: 16px;
+    padding-top: 4px;
     .name {
       font-size: 24px;
     }
@@ -148,24 +164,32 @@ export default {
   .control {
     width: 100%;
     display: flex;
-    gap: 8px;
     flex-direction: column;
     align-items: center;
     > * {
       width: 100%;
       display: flex;
       align-items: center;
-      > * {
-        display: flex;
-        justify-content: center;
-      }
-    }
-    .center {
-      justify-content: center;
     }
     .between {
       padding: 0 16px;
-      justify-content: space-between;
+      display: flex;
+      justify-content: center;
+      > .center {
+        flex-grow: 0;
+      }
+      > .left,
+      > .right {
+        flex-grow: 1;
+        flex-basis: 0;
+        display: flex;
+      }
+      > .left {
+        justify-content: flex-start;
+      }
+      > .right {
+        justify-content: flex-end;
+      }
     }
   }
 }
