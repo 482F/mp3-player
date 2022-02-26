@@ -32,6 +32,7 @@ export default class Playlist {
 
   stop() {
     this.pause()
+    this._currentTime = 0
     this._releaseResources()
   }
 
