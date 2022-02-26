@@ -148,8 +148,6 @@ export default {
   height: 100%;
   min-width: 100%;
   background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
   .content {
     min-height: 0;
     flex-grow: 1;
@@ -164,7 +162,7 @@ export default {
     .lrc {
       min-height: 0;
       flex-grow: 1;
-      margin: 0 16px 16px;
+      margin: 16px;
     }
   }
 }
