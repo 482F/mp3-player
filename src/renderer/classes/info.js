@@ -19,7 +19,7 @@ export default class Info {
 
       const camelKey = `${key[0].toUpperCase()}${key.slice(1)}`
       this[`save${camelKey}`] = throttle((value) => {
-        info.settings.set({ key: value })
+        info.settings.set({ [key]: value })
       }, 1000)
     })
     this._playlists = await this.getAllPlaylists()
