@@ -27,7 +27,7 @@ export default class Info {
   }
   async insertPlaylists(names) {
     this._playlists.push(
-      ...(await info.playlists.insert(names)).map((obj, i) => new Playlist(i, obj))
+      ...(await info.playlists.insert(names)).map((obj, i) => new Playlist(this.playlists.length + i, obj))
     )
   }
   async getAllPlaylists() {
