@@ -28,7 +28,15 @@ export default class Playlist {
 
   stop() {
     this.pause()
+    this._releaseResources()
+  }
+
+  _releaseResources() {
     delete this.file
+    delete this._audioCtx
+    delete this._audioBuffer
+    delete this._source
+    delete this._gainNode
   }
 
   _createSource() {
