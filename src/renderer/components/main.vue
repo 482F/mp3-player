@@ -148,6 +148,8 @@ export default {
   height: 100%;
   min-width: 100%;
   background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
   .content {
     min-height: 0;
     flex-grow: 1;
