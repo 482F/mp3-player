@@ -1,6 +1,7 @@
 <template>
   <div class="lrc">
     <div class="control">
+      <v-icon @click="searchLyricByBrowser">mdi-web</v-icon>
       <v-icon v-if="!editing" @click="$emit('update:editing', true)">
         mdi-pencil
       </v-icon>
@@ -167,6 +168,11 @@ export default {
       this.rawLyric = this.music.lyric
       this.ready = true
     },
+    searchLyricByBrowser() {
+      if (this.music) {
+        this.$openGoogleSearch(this.music.title + ' 歌詞')
+      }
+    },
     cancel() {
       this.rawLyric = this.music.lyric
       this.$emit('update:editing', false)
@@ -185,6 +191,7 @@ export default {
   > .control {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
   }
   > .body {
     min-height: 0;
