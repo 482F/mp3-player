@@ -7,6 +7,7 @@
       @update:volume="updateVolume"
       @skip="skip"
       @shuffle="shuffle"
+      @open="open"
     />
     <div class="content">
       <music-lists
@@ -42,6 +43,7 @@ export default {
   },
   data() {
     return {
+      openSymbol: null,
       editing: false,
       ready: false,
     }
@@ -106,9 +108,10 @@ export default {
         this.info.current.music.stop()
       }
       this.info.current.music = music
+      const openSymbol = (this.openSymbol = Symbol())
       await music.open(this.info.volume)
       // 他の曲が再生された場合
-      if (this.info.current.music !== music) {
+      if (this.openSymbol !== openSymbol) {
         return
       }
       this.info.current.music.start(0)

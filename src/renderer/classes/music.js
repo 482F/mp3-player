@@ -16,6 +16,7 @@ export default class Playlist {
   }
 
   async open(gain = 1) {
+    this.list.playingIndex = this.index
     this._gain = gain
     this.file = await readFile(this.path)
     const buffer = this.file.buffer
@@ -23,6 +24,9 @@ export default class Playlist {
     this._audioBuffer = await new Promise((resolve) =>
       this._audioCtx.decodeAudioData(buffer, resolve)
     )
+    if (!this._audioCtx) {
+      return
+    }
     this._createSource()
   }
 
@@ -83,7 +87,6 @@ export default class Playlist {
     this._intervalId = setInterval(() => this._interval(), 10)
     this._source.start(0, offset / 1000)
     this.isPlaying = true
-    this.list.playingIndex = this.index
   }
   pause() {
     if (this.isPlaying) {

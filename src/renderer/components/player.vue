@@ -11,11 +11,7 @@
     <div class="control">
       <div class="center">
         <v-icon @click="$emit('skip', -1)">mdi-skip-previous</v-icon>
-        <v-icon
-          v-show="!music?.isPlaying"
-          @click="music.start()"
-          size="x-large"
-        >
+        <v-icon v-show="!music?.isPlaying" @click="start" size="x-large">
           mdi-play
         </v-icon>
         <v-icon v-show="music?.isPlaying" @click="music.stop()" size="x-large">
@@ -78,8 +74,21 @@ export default {
       default: false,
     },
   },
+  computed: {
+    info() {
+      return this.$store.state.info
+    },
+  },
   mounted() {},
   methods: {
+    async start() {
+      if (this.music) {
+        this.music.start()
+      } else {
+        const currentList = this.info.playlists[this.info.currentListIndex]
+        this.$emit('open', currentList.musics[currentList.playingIndex])
+      }
+    },
     setTime(time) {
       if (this.music) {
         this.music.currentTime = time
