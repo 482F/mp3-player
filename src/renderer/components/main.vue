@@ -12,9 +12,11 @@
       <music-lists
         ref="musicLists"
         class="music-lists"
+        :style="{ width: (info.leftWidth ?? 600) + 'px' }"
         :lists="info.playlists"
         @open="open"
       />
+      <div class="resizer" @mousedown.left="resizeStart" />
       <lrc
         class="lrc"
         :key="info.current.music?.path"
@@ -139,6 +141,20 @@ export default {
         await this.skip(1)
       }
     },
+    resizeStart(e) {
+      const initLeftWidth = this.info.leftWidth
+      const start = e.clientX
+      const resizing = (e) => {
+        const delta = e.clientX - start
+        this.info.leftWidth = initLeftWidth + delta
+      }
+      const resizeEnd = () => {
+        document.removeEventListener('mousemove', resizing)
+        document.removeEventListener('mouseup', resizeEnd)
+      }
+      document.addEventListener('mousemove', resizing)
+      document.addEventListener('mouseup', resizeEnd)
+    },
   },
 }
 </script>
@@ -153,16 +169,19 @@ export default {
   .content {
     min-height: 0;
     flex-grow: 1;
+    display: flex;
     .music-lists {
-      width: 600px;
       flex-shrink: 0;
+    }
+    .resizer {
+      width: 8px;
+      cursor: ew-resize;
     }
     .lrc {
       min-height: 0;
       flex-grow: 1;
       margin: 0 16px 16px;
     }
-    display: flex;
   }
 }
 </style>
