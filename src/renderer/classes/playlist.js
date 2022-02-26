@@ -14,17 +14,28 @@ export default class Playlist {
     )
   }
 
+  recalcIndice() {
+    this.musics.forEach((music, i) => (music.index = i))
+  }
+
   async insertMusics(index, paths) {
     const musics = (
       await info.playlists.insertMusicsByPaths(this.id, index, paths)
     ).map((music, i) => new Music(this, this._musics.length + i, music))
     this._musics.splice(index, 0, ...musics)
+    this.recalcIndice()
+  }
+
+  async removeMusic(index) {
+    this._musics.splice(index, 1)
+    this.recalcIndice()
+    await info.playlists.removeMusic(this.id, index)
   }
 
   async moveMusic(oldIndex, newIndex) {
     // vuedraggable で既に this.musics は変更されているので db と this.musics[i].index を変更する
-    this.musics.forEach((music, i) => (music.index = i))
     await info.playlists.moveMusic(this.id, oldIndex, newIndex)
+    this.recalcIndice()
   }
 
   get id() {

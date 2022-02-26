@@ -25,6 +25,7 @@
                 }
               }
             "
+            @click.middle="list.removeMusic(music.index)"
           >
             <music-item :music="music" @delete="$emit('delete', i)" />
           </div>
