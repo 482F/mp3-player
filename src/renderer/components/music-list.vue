@@ -5,33 +5,46 @@
     @dragenter.prevent
     @dragover.prevent
   >
-    <v-list density="compact">
-      <div
-        class="music-item"
-        v-for="(music, i) of list?.musics ?? []"
-        :key="i"
-        @dblclick="
-          (e) => {
-            if (!e.shiftKey && !e.ctrlKey) {
-              $emit('open', music, i)
-            }
-          }
-        "
+    <v-list density="compact" v-if="list?.musics">
+      <draggable
+        :list="list.musics"
+        @end="(e) => list.moveMusic(e.oldIndex, e.newIndex)"
+        :animation="200"
+        ghostClass="dragging"
+        item-key="index"
       >
-        <music-item :music="music" @delete="$emit('delete', i)" />
-      </div>
+        <template #item="{ element: music }">
+          <div
+            class="music-item"
+            :key="music.index"
+            @dragstart="dragStart"
+            @dblclick="
+              (e) => {
+                if (!e.shiftKey && !e.ctrlKey) {
+                  $emit('open', music, i)
+                }
+              }
+            "
+          >
+            <music-item :music="music" @delete="$emit('delete', i)" />
+          </div>
+        </template>
+      </draggable>
     </v-list>
+    <div ref="ghost" />
   </div>
 </template>
 
 <script>
 import MusicItem from './music-item.vue'
 import Playlist from '../classes/playlist.js'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'music-list',
   components: {
     MusicItem,
+    Draggable,
   },
   props: {
     list: {
@@ -48,11 +61,14 @@ export default {
     },
   },
   methods: {
+    dragStart(e) {
+      e.dataTransfer.setDragImage(this.$refs.ghost, 0, 0)
+    },
     insertMusics(files) {
-      this.list.insertMusics(
-        0,
-        files.map((file) => file.path)
-      )
+      if (!files.length) {
+        return
+      }
+      this.list.insertMusics(0, files.map((file) => file.path).sort())
     },
   },
 }
@@ -62,6 +78,9 @@ export default {
 .music-list {
   .music-item {
     user-select: none;
+  }
+  .dragging {
+    opacity: 0.6;
   }
 }
 </style>

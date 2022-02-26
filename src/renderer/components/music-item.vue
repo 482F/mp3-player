@@ -1,10 +1,10 @@
 <template>
   <div
     class="music-item"
-    :class="{ invalid: !music.id }"
+    :class="{ invalid: !music?.id }"
     v-intersect="onIntersect"
   >
-    <v-list-item v-if="isIntersect && music.id">
+    <v-list-item v-if="isIntersect && music?.id">
       <div class="playing-icon">
         <v-icon v-show="music.isPlaying">mdi-play</v-icon>
       </div>
