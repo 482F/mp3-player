@@ -6,9 +6,10 @@
     <div class="info">
       <div v-if="music">
         <div class="name">{{ music.title }}</div>
-        <div>
-          {{ music.artist ?? '[no artist]' }} -
-          {{ music.album ?? '[no album]' }}
+        <div class="between">
+          <div class="right">{{ music.artist || '[no artist]' }}</div>
+          <div class="center">-</div>
+          <div class="left">{{ music.album || '[no album]' }}</div>
         </div>
         <div>
           {{ formatTime(music.currentTime) }} / {{ formatTime(music.length) }}
@@ -137,6 +138,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   .info {
+    width: 100%;
     padding-top: 4px;
     .name {
       font-size: 24px;
@@ -171,25 +173,27 @@ export default {
       display: flex;
       align-items: center;
     }
-    .between {
-      padding: 0 16px;
+  }
+  .between {
+    padding: 0 16px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    > .center {
+      flex-grow: 0;
+    }
+    > .left,
+    > .right {
+      flex-grow: 1;
+      flex-basis: 0;
       display: flex;
-      justify-content: center;
-      > .center {
-        flex-grow: 0;
-      }
-      > .left,
-      > .right {
-        flex-grow: 1;
-        flex-basis: 0;
-        display: flex;
-      }
-      > .left {
-        justify-content: flex-start;
-      }
-      > .right {
-        justify-content: flex-end;
-      }
+    }
+    > .left {
+      justify-content: flex-start;
+    }
+    > .right {
+      justify-content: flex-end;
     }
   }
 }
