@@ -7,6 +7,7 @@
   >
     <v-list density="compact" v-if="list?.musics">
       <draggable
+        ref="list"
         :list="list.musics"
         @end="(e) => list.moveMusic(e.oldIndex, e.newIndex)"
         :animation="200"
