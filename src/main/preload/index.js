@@ -50,6 +50,17 @@ const openGoogleSearch = (query) => {
   }
 }
 
+const formatTime = (time, displayMs) => {
+  const f = (num) => Math.floor(num).toString().padStart(2, '0')
+  const hour = Math.floor(time / (60 * 60))
+  const minute = f((time % (60 * 60)) / 60)
+  const second = f(time % 60)
+  const millisecond = f((time * 100) % 100)
+  return `${hour ? hour + ':' : ''}${minute}:${second}${
+    displayMs ? '.' + millisecond : ''
+  }`
+}
+
 const passObject = {
   requires: {
     listenIpc,
@@ -57,6 +68,7 @@ const passObject = {
     readFile: fs.readFile,
     throttle,
     openGoogleSearch,
+    formatTime,
   },
   infoFunctions,
   JSON5,
