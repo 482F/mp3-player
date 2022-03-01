@@ -89,6 +89,10 @@ async function main() {
       const win = sender.getOwnerBrowserWindow()
       win.minimize()
     },
+    reload: ({ sender }) => {
+      const win = sender.getOwnerBrowserWindow()
+      win.reload()
+    },
     quit: () => app.quit(),
     createWindow: (_, ...args) => utls.createWindow(...args),
     getStore: (_, key) => store.get(key),

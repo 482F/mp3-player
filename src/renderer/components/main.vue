@@ -18,12 +18,7 @@
         @open="open"
       />
       <div class="resizer" @mousedown.left="resizeStart" />
-      <lrc
-        class="lrc"
-        :key="info.current.music?.path"
-        :music="info.current.music"
-        v-model:editing="editing"
-      />
+      <lrc class="lrc" :music="info.current.music" v-model:editing="editing" />
     </div>
   </div>
 </template>
@@ -88,7 +83,7 @@ export default {
     async shuffle() {
       await this.info.playlists[this.info.currentListIndex].shuffle()
     },
-    async skip(delta) {
+    async skip(delta, reload = true) {
       const currentList = this.info.current.music.list
       const playingIndex = currentList.playingIndex
       const length = currentList.length
