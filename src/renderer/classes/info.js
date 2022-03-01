@@ -13,6 +13,7 @@ export default class Info {
       currentListIndex: 0,
       loop: false,
       leftWidth: 600,
+      playing: false,
     }
     const settings = await info.settings.insertIfNeededAndGet(defaultSettings)
     Object.entries(settings).forEach(([key, value]) => {
@@ -27,7 +28,9 @@ export default class Info {
   }
   async insertPlaylists(names) {
     this._playlists.push(
-      ...(await info.playlists.insert(names)).map((obj, i) => new Playlist(this.playlists.length + i, obj))
+      ...(await info.playlists.insert(names)).map(
+        (obj, i) => new Playlist(this.playlists.length + i, obj)
+      )
     )
   }
   async getAllPlaylists() {
@@ -64,6 +67,14 @@ export default class Info {
   set leftWidth(value) {
     this._leftWidth = value
     this.saveLeftWidth(value)
+  }
+
+  get playing() {
+    return this._playing
+  }
+  set playing(value) {
+    this._playing = value
+    this.savePlaying(value)
   }
 
   get playlists() {

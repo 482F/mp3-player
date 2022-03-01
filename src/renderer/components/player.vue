@@ -104,13 +104,13 @@ export default {
     stop() {
       this.info.current.music.stop()
       this.info.current.music = null
+      this.info.playing = false
     },
     async start() {
       if (this.music) {
         this.music.start()
       } else {
-        const currentList = this.info.playlists[this.info.currentListIndex]
-        this.$emit('open', currentList.musics[currentList.playingIndex])
+        this.$emit('open')
       }
     },
     setTime(time) {
