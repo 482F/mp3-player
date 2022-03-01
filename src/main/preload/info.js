@@ -120,7 +120,7 @@ const db = createDbProxy('E:\\info.mp-sq3')
   CREATE TABLE IF NOT EXISTS settings (
     id INTEGER UNIQUE NOT NULL PRIMARY KEY,
     key TEXT UNIQUE NOT NULL,
-    value TEXT UNIQUE NOT NULL
+    value TEXT NOT NULL
   );`)
   await db.run(`
   CREATE TABLE IF NOT EXISTS musics (
