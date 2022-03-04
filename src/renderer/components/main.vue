@@ -29,6 +29,8 @@ import MusicLists from './music-lists.vue'
 import Player from './player.vue'
 import Lrc from './lrc/lrc.vue'
 
+let playCount = 0
+
 export default {
   name: 'main',
   components: {
@@ -119,6 +121,10 @@ export default {
       }
       this.info.current.music.start(0)
       this.info.current.music.onended = () => this.onended()
+      playCount++
+      if (10 <= playCount) {
+        this.$sendIpc('main', 'quit')
+      }
     },
     async onended() {
       if (this.info.loop || this.editing) {
