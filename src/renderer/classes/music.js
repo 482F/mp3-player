@@ -16,33 +16,46 @@ export default class Playlist {
   }
 
   async open(gain = 1) {
+    console.log('open')
     this.isPlaying = true
     this.list.playingIndex = this.index
     this._gain = gain
     this.file = await readFile(this.path)
     const buffer = this.file.buffer
     this._audioCtx = new AudioContext()
-    this._audioBuffer = await new Promise((resolve) =>
-      this._audioCtx.decodeAudioData(buffer, resolve)
-    )
+    this._audioBuffer = await this._audioCtx.decodeAudioData(buffer)
     if (!this._audioCtx) {
+      this._releaseResources()
       return
     }
-    this._createSource()
   }
 
   stop() {
+    console.log('stop')
     this.pause()
     this._currentTime = 0
     this._releaseResources()
   }
 
   _releaseResources() {
-    delete this.file
-    delete this._audioCtx
-    delete this._audioBuffer
-    delete this._source
-    delete this._gainNode
+    console.log('release')
+    this.file = null
+    if (this._audioCtx) {
+      this._audioCtx.close().then(() => {
+        this._audioCtx = null
+      })
+    }
+    this._audioBuffer = null
+    if (this._source) {
+      this._source.disconnect()
+      this._source.buffer = null
+      this._source = null
+    }
+    if (this._gainNode) {
+      this._gainNode.disconnect()
+      this._gainNode = null
+    }
+    this.onended = null
   }
 
   _createSource() {
@@ -55,6 +68,7 @@ export default class Playlist {
   }
 
   _interval() {
+    console.log('interval')
     this._currentTime = new Date().getTime() - this._startTime
     if (this.length <= this.currentTime) {
       this.pause()
@@ -84,14 +98,17 @@ export default class Playlist {
   }
 
   start(offset) {
+    console.log('start')
     this._createSource()
-    offset = offset !== undefined ? offset * 1000 : this._currentTime ?? 0 * 1000
+    offset =
+      offset !== undefined ? offset * 1000 : this._currentTime ?? 0 * 1000
     this._startTime = new Date().getTime() - offset
     this._intervalId = setInterval(() => this._interval(), 10)
     this._source.start(0, offset / 1000)
     this.isPlaying = true
   }
   pause() {
+    console.log('pause')
     if (this.isPlaying) {
       clearInterval(this._intervalId)
       this._intervalId = null
@@ -99,7 +116,6 @@ export default class Playlist {
       this._source?.stop?.()
     }
   }
-
 
   get id() {
     return this._id
