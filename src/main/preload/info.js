@@ -199,6 +199,7 @@ info.settings.get = async () => {
           currentListIndex: Number,
           loop: (v) => v === 'true',
           leftWidth: Number,
+          playing: (v) => v === 'true',
         }
         return { [key]: (converters[key] ?? ((v) => v))(value) }
       })

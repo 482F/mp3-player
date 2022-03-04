@@ -56,6 +56,9 @@ export default {
   async mounted() {
     await this.initInfo()
     this.ready = true
+    if (this.info.playing) {
+      this.open()
+    }
   },
   methods: {
     onKeydown(e) {
@@ -99,6 +102,11 @@ export default {
       this.info.current.music.gain = this.info.volume = volume
     },
     async open(music) {
+      this.info.playing = true
+      if (!music) {
+        const currentList = this.info.playlists[this.info.currentListIndex]
+        music = currentList.musics[currentList.playingIndex]
+      }
       if (this.info.current.music) {
         this.info.current.music.stop()
       }
