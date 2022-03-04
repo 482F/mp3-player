@@ -33,7 +33,7 @@
       <v-icon
         class="sort"
         @click="scrollToPlayingItem"
-        :color="autoScroll ? 'black' : '#ccc'"
+        :color="info.autoScroll ? 'black' : '#ccc'"
       >
         mdi-debug-step-into
       </v-icon>
@@ -45,7 +45,7 @@
       :list="lists[info.currentListIndex]"
       @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
-      @mousewheel="autoScroll = false"
+      @mousewheel="info.autoScroll = false"
     />
   </div>
 </template>
@@ -59,9 +59,7 @@ export default {
     MusicList,
   },
   data() {
-    return {
-      autoScroll: false,
-    }
+    return {}
   },
   props: {
     lists: {
@@ -76,6 +74,9 @@ export default {
     info() {
       return this.$store.state.info
     },
+  },
+  mounted() {
+    this.scrollToPlayingItem()
   },
   methods: {
     addList() {
@@ -104,7 +105,7 @@ export default {
       }
     },
     scrollToPlayingItem() {
-      this.autoScroll = true
+      this.info.autoScroll = true
       const items = [...this.$refs.musicList.$refs.list.$el.children]
       items[this.currentList.playingIndex].scrollIntoView({
         behavior: 'smooth',
@@ -114,7 +115,7 @@ export default {
   },
   watch: {
     'currentList.playingIndex': function () {
-      if (!this.autoScroll) {
+      if (!this.info.autoScroll) {
         return
       }
       this.scrollToPlayingItem()

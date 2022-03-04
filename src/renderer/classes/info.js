@@ -14,6 +14,7 @@ export default class Info {
       loop: false,
       leftWidth: 600,
       playing: false,
+      autoScroll: true,
     }
     const settings = await info.settings.insertIfNeededAndGet(defaultSettings)
     Object.entries(settings).forEach(([key, value]) => {
@@ -75,6 +76,14 @@ export default class Info {
   set playing(value) {
     this._playing = value
     this.savePlaying(value)
+  }
+
+  get autoScroll() {
+    return this._autoScroll
+  }
+  set autoScroll(value) {
+    this._autoScroll = value
+    this.saveAutoScroll(value)
   }
 
   get playlists() {

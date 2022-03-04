@@ -191,15 +191,17 @@ info.settings.insert = async (obj) => {
 }
 
 info.settings.get = async () => {
+  const toBoolean = (v) => v === 'true'
   return await db.all(`SELECT * FROM settings`).then((result) =>
     result
       .map(({ key, value }) => {
         const converters = {
           volume: Number,
           currentListIndex: Number,
-          loop: (v) => v === 'true',
+          loop: toBoolean,
           leftWidth: Number,
-          playing: (v) => v === 'true',
+          playing: toBoolean,
+          autoScroll: toBoolean,
         }
         return { [key]: (converters[key] ?? ((v) => v))(value) }
       })
