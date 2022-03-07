@@ -79,7 +79,7 @@ export default {
             seconds,
             milliseconds,
             ,
-            column = '0',
+            column,
             ,
             colorIndex,
             text,
@@ -92,15 +92,37 @@ export default {
             time,
             text,
             column,
-            color: colorDict[colorIndex] ?? colorDict[column] ?? 'black',
+            colorIndex,
           }
         })
         .filter(Boolean)
-      const columnDict = {}
+      const columnDict = { 0: [] }
       for (const datum of data) {
         columnDict[datum.column] ??= []
         columnDict[datum.column].push(datum)
       }
+
+      const columnKeys = Object.keys(columnDict).filter(
+        (key) => key !== 'undefined'
+      )
+      for (const columnKey of columnKeys) {
+        const datum = columnDict[columnKey][0] ?? {}
+        const color =
+          colorDict[datum.colorIndex] ??
+          colorDict[datum.column] ??
+          colorDict[columnKey] ??
+          'black'
+        if (columnDict[undefined]) {
+          for (const undefinedRow of columnDict[undefined]) {
+            columnDict[columnKey].push({ ...undefinedRow })
+          }
+        }
+        columnDict[columnKey].forEach((datum) => (datum.color = color))
+        columnDict[columnKey] = columnDict[columnKey].sort(
+          (a, b) => a.time - b.time
+        )
+      }
+      delete columnDict[undefined]
 
       const splittedData = Object.values(columnDict)
 
