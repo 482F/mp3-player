@@ -1,6 +1,7 @@
 <template>
   <div v-if="ready" class="f-main" tabindex="0" @keydown="onKeydown">
     <player
+      ref="player"
       :music="info.current.music"
       :volume="info.volume"
       v-model:loop="info.loop"
@@ -69,6 +70,14 @@ export default {
         } else if (e.code === 'ArrowLeft') {
           this.shiftMusicTime(-3)
           e.preventDefault()
+        }
+      }
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+        const player = this.$refs.player
+        if (player.music?.isPlaying) {
+          player.music.pause()
+        } else {
+          player.start()
         }
       }
     },
