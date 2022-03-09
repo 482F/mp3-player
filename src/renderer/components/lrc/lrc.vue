@@ -60,10 +60,6 @@ export default {
   },
   computed: {
     lyricData() {
-      const colorDict = {}
-      for (const colorData of [...this.rawLyric.matchAll(/\{(\d+):(.+?)\}/g)]) {
-        colorDict[colorData[1]] = colorData[2]
-      }
       const data = this.rawLyric
         .split('\n')
         .map((line) => {
@@ -106,21 +102,27 @@ export default {
         (key) => key !== 'undefined'
       )
       for (const columnKey of columnKeys) {
-        const datum = columnDict[columnKey][0] ?? {}
-        const color =
-          colorDict[datum.colorIndex] ??
-          colorDict[datum.column] ??
-          colorDict[columnKey] ??
-          'black'
         if (columnDict[undefined]) {
           for (const undefinedRow of columnDict[undefined]) {
-            columnDict[columnKey].push({ ...undefinedRow })
+            columnDict[columnKey].push({ ...undefinedRow, column: columnKey })
           }
         }
-        columnDict[columnKey].forEach((datum) => (datum.color = color))
         columnDict[columnKey] = columnDict[columnKey].sort(
           (a, b) => a.time - b.time
         )
+      }
+      const colorDict = {}
+      for (const colorData of [...this.rawLyric.matchAll(/\{(\d+):(.+?)\}/g)]) {
+        colorDict[colorData[1]] = colorData[2]
+      }
+      for (const columnKey of columnKeys) {
+        for (const row of columnDict[columnKey]) {
+          row.color =
+            colorDict[row.colorIndex] ??
+            colorDict[row.column] ??
+            colorDict[columnKey] ??
+            'black'
+        }
       }
       delete columnDict[undefined]
 
