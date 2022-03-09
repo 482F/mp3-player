@@ -105,6 +105,12 @@ export default {
           await this.$nextTick()
           this.setSelectedLineIndex(index)
         }
+      } else {
+        if (e.code === 'Enter') {
+          await new Promise((resolve) => setTimeout(resolve, 0))
+          const index = this.getSelectedLineIndex()
+          this.scrollToLine(index)
+        }
       }
     },
     onInput(e) {
