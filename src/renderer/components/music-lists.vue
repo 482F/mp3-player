@@ -106,8 +106,15 @@ export default {
     },
     scrollToPlayingItem() {
       this.info.autoScroll = true
+      if (!this.$refs.musicList.$refs.list) {
+        return
+      }
       const items = [...this.$refs.musicList.$refs.list.$el.children]
-      items[this.currentList.playingIndex].scrollIntoView({
+      const item = items[this.currentList.playingIndex]
+      if (!item) {
+        return
+      }
+      item.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
       })
