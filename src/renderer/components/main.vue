@@ -72,7 +72,7 @@ export default {
           e.preventDefault()
         }
       }
-      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+      if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         const player = this.$refs.player
         if (player.music?.isPlaying) {
           player.music.pause()
