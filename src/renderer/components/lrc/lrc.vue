@@ -95,13 +95,13 @@ export default {
       for (let i = 0; i < data.length; i++) {
         const currentDatum = data[i]
         const nextDatum = data[i + 1] ?? {}
-        const nextSameColumnDatum = data
-          .slice(i + 1)
-          .find((datum) => currentDatum.column === datum.column)
-        console.log({currentDatum, nextDatum, nextSameColumnDatum})
+        const nextSameColumnDatum =
+          data
+            .slice(i + 1)
+            .find((datum) => currentDatum.column === datum.column) ?? {}
         if (
           currentDatum.text !== '' &&
-          currentDatum.column !== nextDatum.column &&
+          ![currentDatum.column, undefined].includes(nextDatum.column) &&
           nextSameColumnDatum.text !== ''
         ) {
           data.splice(i + 1, 0, {
