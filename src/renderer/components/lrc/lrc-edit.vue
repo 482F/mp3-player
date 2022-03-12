@@ -105,6 +105,11 @@ export default {
           await this.$nextTick()
           this.setSelectedLineIndex(index)
         }
+      } else {
+        if (e.code === 'Enter') {
+          const index = this.getSelectedLineIndex()
+          this.scrollToLine(index)
+        }
       }
     },
     onInput(e) {
