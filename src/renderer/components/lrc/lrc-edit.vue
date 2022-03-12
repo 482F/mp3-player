@@ -107,6 +107,7 @@ export default {
         }
       } else {
         if (e.code === 'Enter') {
+          await new Promise((resolve) => setTimeout(resolve, 0))
           const index = this.getSelectedLineIndex()
           this.scrollToLine(index)
         }
