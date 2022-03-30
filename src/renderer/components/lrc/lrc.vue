@@ -92,27 +92,6 @@ export default {
           }
         })
         .filter(Boolean)
-      for (let i = 0; i < data.length; i++) {
-        const currentDatum = data[i]
-        const nextDatum = data[i + 1] ?? {}
-        const nextSameColumnDatum =
-          data
-            .slice(i + 1)
-            .find((datum) => currentDatum.column === datum.column) ?? {}
-        if (
-          currentDatum.text !== '' &&
-          ![currentDatum.column, undefined].includes(nextDatum.column) &&
-          nextSameColumnDatum.text !== ''
-        ) {
-          data.splice(i + 1, 0, {
-            time: nextDatum.time,
-            text: '',
-            column: currentDatum.column,
-            color: 'black',
-          })
-          i++
-        }
-      }
       const columnDict = { 0: [] }
       for (const datum of data) {
         columnDict[datum.column] ??= []
@@ -162,36 +141,6 @@ export default {
           column: column.column,
           color: 'black',
         })
-        const diffs = []
-        for (let i = 0; i < column.length - 1; i++) {
-          if (column[i].text === '') {
-            continue
-          }
-          const start = column[i].time
-          const end = column[i + 1].time
-          const diff = end - start
-          diffs.push(diff)
-        }
-        const maxDiff =
-          diffs.reduce((sum, num) => (sum += num), 0) / diffs.length
-        for (let i = 0; i < column.length - 1; i++) {
-          const start = column[i].time
-          const end = column[i + 1].time
-          const diff = end - start
-          if (column[i].text === '' && maxDiff <= diff) {
-            const numberOfPadding = Math.floor(diff / maxDiff)
-            const times = Array(numberOfPadding)
-              .fill(0)
-              .map((_, i) => (diff * (i + 1)) / (numberOfPadding + 1) + start)
-              .map(Math.round)
-            column.splice(
-              i + 1,
-              0,
-              ...times.map((time) => ({ time, text: '' }))
-            )
-            i += numberOfPadding
-          }
-        }
       }
       return splittedData
     },

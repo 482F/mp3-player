@@ -1,5 +1,5 @@
 <template>
-  <div v-if="ready" class="f-main" tabindex="0" @keydown="onKeydown">
+  <div v-if="ready" ref="main" class="f-main" tabindex="0" @keydown="onKeydown">
     <player
       ref="player"
       :music="info.current.music"
@@ -60,6 +60,8 @@ export default {
     if (this.info.playing) {
       this.open()
     }
+    await this.$nextTick()
+    this.$refs.main.focus()
   },
   methods: {
     onKeydown(e) {
@@ -72,7 +74,10 @@ export default {
           e.preventDefault()
         }
       }
-      if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (
+        e.code === 'Space' &&
+        !['INPUT', 'TEXTAREA'].includes(e.target.tagName)
+      ) {
         const player = this.$refs.player
         if (player.music?.isPlaying) {
           player.music.pause()
