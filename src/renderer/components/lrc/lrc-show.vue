@@ -14,7 +14,7 @@
           :key="j"
           class="line"
           :class="{ current: currentIndice[i] === j }"
-          :style="{ color }"
+          :style="{ color, ...heights?.[i]?.[j] }"
         >
           {{ line }}
           <div class="mask" />
@@ -44,6 +44,38 @@ export default {
   },
   computed: {
     lineHeight: () => lineHeight,
+    averageDiff() {
+      return this.lyricData.map((column) => {
+        const diffs = []
+        for (let i = 0; i < column.length - 1; i++) {
+          if (column[i].text === '') {
+            continue
+          }
+          const start = column[i].time
+          const end = column[i + 1].time
+          const diff = end - start
+          diffs.push(diff)
+        }
+        return diffs.reduce((sum, num) => (sum += num), 0) / diffs.length
+      })
+    },
+    heights() {
+      return this.lyricData.map((column, i) =>
+        column.map((row, j) => {
+          if (row.text !== '') {
+            return {}
+          }
+          const nextRow = column[j + 1]
+          if (!nextRow) {
+            return {}
+          }
+          const diff = nextRow.time - row.time
+          const rate = diff / this.averageDiff[i]
+          const height = `${lineHeight * rate}px`
+          return { height }
+        })
+      )
+    },
     currentTime() {
       return Math.round((this.music?.currentTime ?? 0) * 1000)
     },
