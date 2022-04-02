@@ -2,6 +2,7 @@ const id3 = require('node-id3')
 const mp3Duration = require('mp3-duration')
 const fs = require('./fs.js')
 const path = require('path')
+const { shell } = require('electron')
 
 function snakeKeyToCamel(obj) {
   const newObj = {}
@@ -66,22 +67,26 @@ const getAllPaths = async (targetPaths, filterExts = null) => {
   const paths = []
   for (const targetPath of targetPaths) {
     if (await fs.stat(targetPath).then((stats) => stats.isDirectory())) {
-      const children = await fs.readdir(targetPath)
-      for (const child of children) {
-        const absPath = path.join(targetPath, child)
-        if (await fs.stat(absPath).then((stats) => stats.isDirectory())) {
-          paths.push(...(await getAllPaths([absPath], filterExts)))
-        } else {
-          if (
-            !filterExts ||
-            filterExts.includes(child.match(fs.extPattern)[1])
-          ) {
-            paths.push(absPath)
-          }
+      const children = (await fs.readdir(targetPath)).map((child) =>
+        path.join(targetPath, child)
+      )
+      paths.push(...(await getAllPaths(children, filterExts)))
+    } else {
+      if (await fs.stat(targetPath).then((stats) => stats.isDirectory())) {
+        paths.push(...(await getAllPaths([targetPath], filterExts)))
+      } else {
+        const ext = targetPath.match(fs.extPattern)[1]
+        if (!filterExts || filterExts.includes(ext)) {
+          paths.push(targetPath)
+        } else if (ext === 'lnk') {
+          paths.push(
+            ...(await getAllPaths(
+              [shell.readShortcutLink(targetPath).target],
+              filterExts
+            ))
+          )
         }
       }
-    } else {
-      paths.push(targetPath)
     }
   }
   return paths
