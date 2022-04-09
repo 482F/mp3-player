@@ -68,7 +68,7 @@ async function main() {
     height: size.height,
     minWidth: 300,
     minHeight: 300,
-    transparent: true,
+    transparent: false,
     frame: false,
     toolbar: false,
     hasShadow: false,
