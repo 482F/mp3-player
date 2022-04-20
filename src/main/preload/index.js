@@ -45,7 +45,9 @@ const openGoogleSearch = (query) => {
     spawn('cmd.exe', [
       '/c',
       'start',
-      `https://www.google.com/search?q=${query.replaceAll(' ', '+')}`,
+      `https://www.google.com/search?q=${query
+        .replaceAll(' ', '+')
+        .replaceAll('&', ' ')}`,
     ])
   }
 }
