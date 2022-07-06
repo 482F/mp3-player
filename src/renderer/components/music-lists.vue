@@ -118,10 +118,11 @@ export default {
         list.name = newName
       }
     },
-    scrollToPlayingItem() {
+    async scrollToPlayingItem() {
       this.info.autoScroll = true
-      if (!this.$refs.musicList.$refs.list) {
-        return
+      while (true) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        if (this.$refs.musicList.$refs.list) break
       }
       const items = [...this.$refs.musicList.$refs.list.$el.children]
       const item = items[this.currentList.playingIndex]
