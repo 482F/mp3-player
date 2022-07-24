@@ -77,6 +77,9 @@ async function main() {
     toolbar: false,
     hasShadow: false,
     show: false,
+    webPreferences: {
+      webviewTag: true,
+    },
   }
   const menuItems = [
     {
@@ -126,7 +129,6 @@ async function main() {
   } else if (minimized) {
     mainWin.minimize()
   }
-
 
   mainWin.on('resized', () => {
     if (mainWin.isMaximized()) {
