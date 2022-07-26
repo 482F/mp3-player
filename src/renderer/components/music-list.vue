@@ -8,9 +8,8 @@
     <v-list density="compact" v-if="list?.musics">
       <draggable
         ref="list"
-        :list="list.musics"
+        :list="searchedMusics"
         @end="(e) => list.moveMusic(e.oldIndex, e.newIndex)"
-        :animation="200"
         ghostClass="dragging"
         item-key="index"
       >
@@ -53,11 +52,20 @@ export default {
       type: Playlist,
       required: true,
     },
+    searchText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {}
   },
   computed: {
+    searchedMusics() {
+      return this.searchText === ''
+        ? this.list.musics
+        : this.list.musics.filter((music) => music.title.match(this.searchText))
+    },
     info() {
       return this.$store.state.info
     },

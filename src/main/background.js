@@ -61,6 +61,10 @@ async function main() {
 
   const position = store.get('position')
   const size = store.get('size')
+  const maximized = store.get('maximized')
+  const minimized = store.get('minimized')
+  let beforeSize = [size.width, size.height]
+  let beforePosition = [position.x, position.y]
   const options = {
     x: position.x,
     y: position.y,
@@ -68,10 +72,14 @@ async function main() {
     height: size.height,
     minWidth: 300,
     minHeight: 300,
-    transparent: true,
+    transparent: false,
     frame: false,
     toolbar: false,
     hasShadow: false,
+    show: false,
+    webPreferences: {
+      webviewTag: true,
+    },
   }
   const menuItems = [
     {
@@ -115,9 +123,30 @@ async function main() {
   )
 
   const mainWin = await utls.createWindow(options, menuItems, 'Main')
+  mainWin.showInactive()
+  if (maximized) {
+    mainWin.maximize()
+  } else if (minimized) {
+    mainWin.minimize()
+  }
+
+  mainWin.on('resized', () => {
+    if (mainWin.isMaximized()) {
+      return
+    }
+    beforeSize = mainWin.getSize()
+  })
+  mainWin.on('moved', () => {
+    if (mainWin.isMaximized()) {
+      return
+    }
+    beforePosition = mainWin.getPosition()
+  })
   mainWin.on('close', () => {
-    const position = mainWin.getPosition()
-    const size = mainWin.getSize()
+    const maximized = mainWin.isMaximized()
+    const position = maximized ? beforePosition : mainWin.getPosition()
+    const size = maximized ? beforeSize : mainWin.getSize()
+    const minimized = mainWin.isMinimized()
     store.set({
       position: {
         x: position[0],
@@ -127,6 +156,8 @@ async function main() {
         width: size[0],
         height: size[1],
       },
+      maximized,
+      minimized,
     })
   })
 

@@ -1,48 +1,60 @@
 <template>
   <div class="music-lists">
     <div class="header">
-      <div
-        class="lists"
-        @mousewheel.prevent="(e) => moveList(Math.sign(-e.wheelDelta))"
-      >
-        <v-list-item
-          ref="list"
-          class="item"
-          :class="info.currentListIndex === list.index ? 'current' : ''"
-          :rounded="0"
-          v-for="list of lists.filter((list) => list.isDisplay)"
-          :key="list.id"
-          @mousedown.left="info.currentListIndex = list.index"
-          @dblclick="renameList(list, list.index)"
-          @click.middle="list.isDisplay = false"
+      <div>
+        <div
+          class="lists"
+          @mousewheel.prevent="(e) => moveList(Math.sign(-e.wheelDelta))"
         >
-          <span v-show="list.renaming">
-            <input
-              ref="renamer"
-              class="renamer"
-              type="text"
-              :value="list.name"
-              @blur="(e) => endRename(list, e.target.value)"
-              @keypress.enter="(e) => endRename(list, e.target.value)"
-            />
-          </span>
-          <span v-show="!list.renaming">{{ list.name }}</span>
-        </v-list-item>
-        <v-icon class="plus" @click="addList">mdi-plus</v-icon>
+          <v-list-item
+            ref="list"
+            class="item"
+            :class="info.currentListIndex === list.index ? 'current' : ''"
+            :rounded="0"
+            v-for="list of lists.filter((list) => list.isDisplay)"
+            :key="list.id"
+            @mousedown.left="info.currentListIndex = list.index"
+            @dblclick="renameList(list, list.index)"
+            @click.middle="list.isDisplay = false"
+          >
+            <span v-show="list.renaming">
+              <input
+                ref="renamer"
+                class="renamer"
+                type="text"
+                :value="list.name"
+                @blur="(e) => endRename(list, e.target.value)"
+                @keypress.enter="(e) => endRename(list, e.target.value)"
+              />
+            </span>
+            <span v-show="!list.renaming">{{ list.name }}</span>
+          </v-list-item>
+          <v-icon class="plus" @click="addList">mdi-plus</v-icon>
+        </div>
+        <v-icon
+          class="sort"
+          @click="scrollToPlayingItem"
+          :color="info.autoScroll ? 'black' : '#ccc'"
+        >
+          mdi-debug-step-into
+        </v-icon>
       </div>
-      <v-icon
-        class="sort"
-        @click="scrollToPlayingItem"
-        :color="info.autoScroll ? 'black' : '#ccc'"
-      >
-        mdi-debug-step-into
-      </v-icon>
+      <div>
+        <v-text-field
+          v-model="searchText"
+          class="search"
+          density="compact"
+          variant="underlined"
+          clearable
+        />
+      </div>
     </div>
     <music-list
       class="music-list"
       ref="musicList"
       :key="info.currentListIndex"
       :list="lists[info.currentListIndex]"
+      :search-text="searchText"
       @delete="(index) => $emit('delete-item', currentList, i)"
       @open="(music, index) => $emit('open', music, currentList, index)"
       @mousewheel="info.autoScroll = false"
@@ -59,7 +71,9 @@ export default {
     MusicList,
   },
   data() {
-    return {}
+    return {
+      searchText: '',
+    }
   },
   props: {
     lists: {
@@ -104,10 +118,11 @@ export default {
         list.name = newName
       }
     },
-    scrollToPlayingItem() {
+    async scrollToPlayingItem() {
       this.info.autoScroll = true
-      if (!this.$refs.musicList.$refs.list) {
-        return
+      while (true) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        if (this.$refs.musicList.$refs.list) break
       }
       const items = [...this.$refs.musicList.$refs.list.$el.children]
       const item = items[this.currentList.playingIndex]
@@ -137,38 +152,48 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
-  .header {
+  > .header {
     width: 100%;
     position: sticky;
     top: 0;
     background-color: white;
     z-index: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .lists {
+    flex-direction: column;
+    > * {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      flex-shrink: 0;
-      overflow-y: hidden;
-      overflow-x: scroll;
-      &::-webkit-scrollbar {
-        width: 0px !important;
-        height: 0px !important;
-      }
-      .item {
-        background-color: #eee;
-        user-select: none;
-        &.current {
-          background-color: #c7b897;
+      .lists {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        &::-webkit-scrollbar {
+          width: 0px !important;
+          height: 0px !important;
+        }
+        .item {
+          background-color: #eee;
+          user-select: none;
+          &.current {
+            background-color: #c7b897;
+          }
+        }
+        .plus {
+          margin-left: 4px;
         }
       }
-      .plus {
-        margin-left: 4px;
+      .sort {
+        margin-right: 4px;
       }
-    }
-    .sort {
-      margin-right: 4px;
+      .search {
+        margin: 0 1rem;
+        > ::v-deep(.v-input__details) {
+          display: none;
+        }
+      }
     }
   }
   .music-list {
