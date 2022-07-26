@@ -1,11 +1,16 @@
 <template>
   <div class="lrc">
     <div class="control">
-      <v-icon @click="searchLyricByBrowser">mdi-web</v-icon>
       <v-icon v-if="!editing" @click="$emit('update:editing', true)">
         mdi-pencil
       </v-icon>
       <template v-else>
+        <v-icon
+          @click="searching = !searching"
+          :style="{ color: searching ? 'black' : 'lightgray' }"
+        >
+          mdi-web
+        </v-icon>
         <v-icon @click="cancel"> mdi-close </v-icon>
         <v-icon
           @click="
@@ -20,13 +25,20 @@
       </template>
     </div>
     <div class="body" v-if="ready">
-      <lrc-edit
-        v-if="editing"
-        class="lrc-edit"
-        :music="music"
-        v-model:raw-lyric="rawLyric"
-        @save="save"
-      />
+      <template v-if="editing">
+        <lrc-search
+          v-if="searching"
+          class="lrc-search"
+          :music="music"
+          @search-by-browser="searchLyricByBrowser"
+        />
+        <lrc-edit
+          class="lrc-edit"
+          :music="music"
+          v-model:raw-lyric="rawLyric"
+          @save="save"
+        />
+      </template>
       <lrc-show class="lrc-show" :music="music" :lyric-data="lyricData" />
     </div>
   </div>
@@ -34,18 +46,21 @@
 
 <script>
 import LrcShow from './lrc-show.vue'
+import LrcSearch from './lrc-search.vue'
 import LrcEdit from './lrc-edit.vue'
 
 export default {
   name: 'lrc',
   components: {
     LrcShow,
+    LrcSearch,
     LrcEdit,
   },
   data() {
     return {
       rawLyric: '',
       ready: false,
+      searching: false,
     }
   },
   props: {
@@ -156,6 +171,7 @@ export default {
   methods: {
     async init() {
       this.ready = false
+      this.searching = false
       if (!this.music) {
         return
       }
@@ -164,7 +180,9 @@ export default {
     },
     searchLyricByBrowser() {
       if (this.music) {
-        this.$openGoogleSearch(this.music.title + ' 歌詞')
+        this.$openGoogleSearch(
+          [this.music.title, this.music.artist ?? '', '歌詞'].join(' ')
+        )
       }
     },
     cancel() {
