@@ -10,7 +10,6 @@
         ref="list"
         :list="searchedMusics"
         @end="(e) => list.moveMusic(e.oldIndex, e.newIndex)"
-        :animation="200"
         ghostClass="dragging"
         item-key="index"
       >
