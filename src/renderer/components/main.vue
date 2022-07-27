@@ -137,7 +137,7 @@ export default {
       this.info.current.music.onended = () => this.onended()
       playCount++
       if (10 <= playCount) {
-        this.$sendIpc('main', 'quit')
+        this.$sendIpc('main', 'rerun')
       }
     },
     async onended() {

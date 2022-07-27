@@ -4,10 +4,12 @@ const path = require('path')
 
 async function main() {
   // 二重起動の防止
-  const gotTheLock = app.requestSingleInstanceLock()
-  if (!gotTheLock) {
-    app.quit()
-    return
+  if (!app.requestSingleInstanceLock()) {
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    if (!app.requestSingleInstanceLock()) {
+      app.quit()
+      return
+    }
   }
 
   const appHandlers = {
@@ -102,6 +104,14 @@ async function main() {
       win.reload()
     },
     quit: () => app.quit(),
+    rerun: () => {
+      const childProcess = require('child_process')
+      const child = childProcess.spawn(process.argv[0], process.argv.slice(1), {
+        detached: true,
+      })
+      child.unref()
+      app.quit()
+    },
     createWindow: (_, ...args) => utls.createWindow(...args),
     getStore: (_, key) => store.get(key),
     setStore: (_, key, value) => {
