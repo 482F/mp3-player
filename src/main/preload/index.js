@@ -3,6 +3,7 @@ const path = require('path')
 const JSON5 = require('json5')
 const info = require('./info.js')
 const fs = require('./fs.js')
+const lyric = require('./lyric.js')
 const throttle = require('lodash/throttle')
 const { spawn } = require('child_process')
 
@@ -76,6 +77,7 @@ const passObject = {
   JSON5,
   path,
   info,
+  lyric,
 }
 
 Object.entries(passObject).forEach(([apiKey, api]) =>
