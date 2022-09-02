@@ -111,6 +111,7 @@ export default {
 
 <style lang="scss" scoped>
 .lrc-show {
+  cursor: default;
   line-height: var(--line-height);
   overflow: hidden;
   height: 100%;

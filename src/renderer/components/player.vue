@@ -128,6 +128,7 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  cursor: default;
   .info {
     height: 100px;
     width: 100%;
