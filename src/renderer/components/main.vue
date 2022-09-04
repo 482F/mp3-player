@@ -126,6 +126,7 @@ export default {
       }
       this.info.current.music = music
       const openSymbol = (this.openSymbol = Symbol())
+      document.title = music.title + '  -  mp3-player'
       await music.open(this.info.volume)
       // 他の曲が再生された場合
       if (this.openSymbol !== openSymbol) {
