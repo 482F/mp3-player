@@ -31,9 +31,9 @@ ipcMain.handle('sendIpc', async (event, json) => {
   const results = []
   for (let i = 0; i < targetHandlers.length; i++) {
     results.push(
-      await targetHandlers[i](event, ...args).catch(
-        () => (targetHandlers[i] = null)
-      )
+      await targetHandlers[i](event, ...args).catch((e) => ({
+        __errorMessage: e.message,
+      }))
     )
   }
   handlers[key] = targetHandlers.filter(Boolean)

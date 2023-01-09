@@ -19,12 +19,16 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 const sendIpc = async (listenerName, eventName, ...args) => {
-  return JSON.parse(
+  const result = JSON.parse(
     (await ipcRenderer.invoke(
       'sendIpc',
       JSON.stringify([`${listenerName}-${eventName}`, args])
     )) ?? null
   )
+  if (result?.[0]?.__errorMessage) {
+    throw result[0].__errorMessage
+  }
+  return result
 }
 const listenIpc = async (listenerName, eventName, handler) => {
   ipcRenderer.on(`${listenerName}-${eventName}`, (_, args) =>
