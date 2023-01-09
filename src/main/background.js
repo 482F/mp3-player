@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron'
 import utls from './main-utls.js'
+import { getLyricSites } from 'node-scraping/ondemand/lyrics.cjs'
 const path = require('path')
 
 async function main() {
@@ -117,6 +118,18 @@ async function main() {
         return utls.sendIpc(win, listenerName, eventName, ...args)
       })
     },
+    ...(() => {
+      let sites = null
+      return {
+        async getLyricSites(_, title, artist) {
+          sites = await getLyricSites(title, artist)
+          return sites.map((site) => ({ title: site.title }))
+        },
+        async getLyric(_, title, artist, i) {
+          return await sites[i].getLyric()
+        },
+      }
+    })(),
   }
   Object.entries(ipcHandlers).forEach(([eventName, handler]) =>
     utls.listenIpc('main', eventName, handler)

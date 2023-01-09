@@ -29,6 +29,7 @@
     "lodash": "^4.17.21",
     "mp3-duration": "^1.1.0",
     "node-id3": "^0.2.3",
+    "node-scraping": "https://github.com/482F/node-scraping.git",
     "npm-run-all": "^4.1.5",
     "roboto-fontface": "*",
     "sqlite3": "^5.0.2",
@@ -54,6 +55,7 @@
   },
   "build": {
     "productName": "mp3-player",
+    "asar": false,
     "files": [
       "dist/**/*"
     ],
