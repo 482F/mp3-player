@@ -44,7 +44,6 @@ async function main() {
 
   const Store = require('electron-store')
   const store = new Store({
-    cwd: path.dirname(app.getPath('exe')),
     defaults: {
       position: {
         x: 500,
@@ -55,6 +54,7 @@ async function main() {
         height: 300,
       },
       text: 'abc',
+      infoPath: 'E:\\info.mp-sq3'
     },
   })
 

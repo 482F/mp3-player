@@ -118,7 +118,10 @@ const getAllMusicPaths = async (targetPaths) => {
   return musicPaths.filter(fs.existsSync)
 }
 
-const db = createDbProxy('E:\\info.mp-sq3')
+
+const Store = require('electron-store')
+const infoPath = new Store().get('infoPath')
+const db = createDbProxy(infoPath)
 
 ;(async function () {
   await db.run(`
